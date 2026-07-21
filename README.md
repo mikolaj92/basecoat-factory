@@ -12,7 +12,7 @@ Tylko link do pliku z `dist/`.
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/OWNER/basecoat-factory@v0.1.0/dist/basecoat-factory.min.css"
+  href="https://cdn.jsdelivr.net/gh/mikolaj92/basecoat-factory@v0.1.0/dist/basecoat-factory.min.css"
 />
 <script
   src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/all.min.js"
