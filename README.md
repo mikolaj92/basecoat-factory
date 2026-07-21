@@ -1,86 +1,79 @@
 # basecoat-factory
 
-**Jeden prebuilt CSS** = [Basecoat UI](https://basecoatui.com) (komponenty) + **używane** utility z Tailwind.
+**Jeden prebuilt CSS** dla apek Jinja/HTMX:
 
-Aplikacje (rnkstr, wolnyrolnik, emitype, …) **nie potrzebują npm ani Tailwind**.  
-Tylko link do pliku z `dist/`.
+1. [Basecoat UI](https://basecoatui.com) — komponenty (`btn`, `card`, `sidebar`, …)
+2. **Utility Tailwind** — tylko to, co jest w safelist / `src/apps/`
+3. **App shell** — wspólny layout `.app-*` (sidebar + main, stack, card grid, auth page, …)
 
-## Consumer (apki)
+Repo: **https://github.com/mikolaj92/basecoat-factory** (public)
 
-### Opcja A — raw z Gita (jsDelivr)
+Aplikacje (**rnkstr**, **wolnyrolnik**, **emitype**, …) **nie potrzebują**:
+
+- npm / Tailwind w apce
+- lokalnego `app-shell.css` / `basecoat-full.css`
+
+Tylko link z **jsDelivr**.
+
+## Consumer
+
+### jsDelivr — pinuj tag
 
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/mikolaj92/basecoat-factory@v0.1.0/dist/basecoat-factory.min.css"
+  href="https://cdn.jsdelivr.net/gh/mikolaj92/basecoat-factory@v0.2.0/dist/basecoat-factory.min.css"
 />
 <script
-  src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/all.min.js"
+  src="https://cdn.jsdelivr.net/gh/mikolaj92/basecoat-factory@v0.2.0/dist/basecoat-js.min.js"
   defer
 ></script>
 ```
 
-(Po pushu na GitHub podmień `OWNER` i tag.)
+| Plik | URL |
+|------|-----|
+| CSS | `https://cdn.jsdelivr.net/gh/mikolaj92/basecoat-factory@v0.2.0/dist/basecoat-factory.min.css` |
+| JS | `https://cdn.jsdelivr.net/gh/mikolaj92/basecoat-factory@v0.2.0/dist/basecoat-js.min.js` |
 
-### Opcja B — kopia w apce
+Pinuj **`@v0.2.0`**, nie `@main`.
 
-```bash
-cp /path/to/basecoat-factory/dist/basecoat-factory.min.css static/css/
-```
+### Co jest w CSS
 
-```html
-<link rel="stylesheet" href="/static/css/basecoat-factory.min.css" />
-```
+| Warstwa | Przykłady |
+|---------|-----------|
+| Basecoat | `btn`, `card`, `input`, `sidebar`, `dialog`, … |
+| Utility (safelist) | `flex`, `gap-2`, `mt-4`, `text-sm`, `grid-cols-3`, … |
+| App shell (wspólne) | `app-shell`, `app-main`, `app-stack`, `app-card-grid--3`, `app-nav-link`, `app-state-page`, … |
 
-JS Basecoat (sidebar, toast, …) nadal z CDN lub vendored:
+Alias layoutu: `factory-shell` / `factory-main` / `factory-stack` = te same reguły co `app-*` (opcjonalnie).
 
-```html
-<script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/all.min.js" defer></script>
-```
-
-### Layout helpers (w tym pliku CSS)
-
-| Klasa | Znaczenie |
-|--------|-----------|
-| `factory-shell` | root body layout |
-| `factory-main` | kolumna treści obok sidebara |
-| `factory-main-content` | scroll content |
-| `factory-content` | max-width + padding |
-| `factory-stack` / `factory-stack-sm` | pionowy stack |
-| `factory-cluster` | flex wrap gap |
-| `factory-page-header` | tytuł + akcje |
-
-Plus standardowe Basecoat (`btn`, `card`, `input`, `sidebar`, …) i utility z safelist (`flex`, `gap-2`, `mt-4`, `text-sm`, …).
+**W apce nie trzymaj** drugiego `static/css/app-shell.css` — będzie dublowanie.
 
 ## Build (tylko to repo)
-
-Wymaga Node **tylko tutaj** (nie w rnkstr/wolnyrolnik):
 
 ```bash
 npm install
 make build
+git add dist/ && git commit -m "build: refresh dist"
+git tag v0.2.1 && git push origin main --tags
 ```
 
-Wynik: `dist/basecoat-factory.min.css` — **commituj do gita**.
+### Nowe utility w apkach
 
-### Nowe classy w apkach
+1. Dopisz klasę do `src/safelist.html` **albo** wrzuć HTML pod `src/apps/`.
+2. `make build` → commit `dist/` + nowy tag.
+3. W apkach bump pin + SRI.
 
-1. Dopisz classę do `src/safelist.html` **albo** wrzuć HTML apki pod `src/apps/` i przebuduj.  
-2. `make build`  
-3. Commit `dist/` + tag `v0.1.x`
+### Zmiana layoutu shell
 
-### Watch (opcjonalnie przy robocie nad kitem)
-
-```bash
-make watch
-```
+Edytuj `src/app-shell.css` (nie w rnkstr/wolnyrolnik).
 
 ## Co to NIE jest
 
-- Nie cały Tailwind na CDN (tylko classy ze skanu/safelist).  
-- Nie Play CDN (`cdn.tailwindcss.com` — ~400 KiB JS).  
-- Nie trzeba `make css` w każdej apce przy autoreload — `dist/` jest w gicie.
+- Nie cały Tailwind na CDN.
+- Nie Play CDN (`cdn.tailwindcss.com`).
+- Nie `make css` w każdej apce.
 
-## Wersjonowanie
+## Rozmiar
 
-Semver na tagach: `v0.1.0`, `v0.2.0` przy breaking zmianach kitu.
+Patrz `make size` po buildzie.

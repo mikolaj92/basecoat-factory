@@ -1,6 +1,6 @@
 {
   "name": "@patryk/basecoat-factory",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Prebuilt Basecoat UI + Tailwind utilities for Jinja/HTMX apps (no npm in consumers)",
   "scripts": {
