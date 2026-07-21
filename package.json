@@ -1,0 +1,16 @@
+{
+  "name": "@patryk/basecoat-factory",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Prebuilt Basecoat UI + Tailwind utilities for Jinja/HTMX apps (no npm in consumers)",
+  "scripts": {
+    "build": "tailwindcss -i ./src/input.css -o ./dist/basecoat-factory.min.css --minify",
+    "build:dev": "tailwindcss -i ./src/input.css -o ./dist/basecoat-factory.css",
+    "watch": "tailwindcss -i ./src/input.css -o ./dist/basecoat-factory.min.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.11",
+    "basecoat-css": "^0.3.2",
+    "tailwindcss": "^4.1.11"
+  }
+}

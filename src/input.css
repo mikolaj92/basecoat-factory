@@ -1,0 +1,80 @@
+/*
+  Factory stylesheet: Basecoat components + scanned Tailwind utilities.
+  Build: npm run build  →  dist/basecoat-factory.min.css
+  Consumers only link the dist file (CDN / git raw / static copy). No npm in apps.
+*/
+
+@import "tailwindcss";
+@import "basecoat-css";
+
+/* Scan safelist (+ optional app templates if you mount them under src/apps/) */
+@source "./safelist.html";
+@source "./apps/**/*.html";
+
+/* Minimal layout glue (sidebar sibling main) — not a full app-shell utility dump */
+@layer components {
+  .factory-shell {
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .factory-main {
+    display: flex;
+    min-width: 0;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+  /* Basecoat already margins .sidebar + *; this helps when main is nested */
+  @media (min-width: 48rem) {
+    .sidebar:not([aria-hidden="true"]) ~ .factory-main,
+    .sidebar:not([aria-hidden="true"]) + .factory-main {
+      margin-left: var(--sidebar-width, 16rem);
+      width: calc(100% - var(--sidebar-width, 16rem));
+    }
+  }
+
+  .factory-main-content {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .factory-content {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: clamp(1rem, 2vw, 2rem);
+  }
+
+  .factory-page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .factory-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .factory-stack-sm {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .factory-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
