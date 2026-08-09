@@ -1,78 +1,65 @@
 # basecoat-factory
 
-**Jeden prebuilt CSS** dla apek Jinja/HTMX:
+**Maintainer-only build source** for the platform assets bundled by
+[`app-factory`](https://github.com/mikolaj92/app-factory). It produces:
 
-1. [Basecoat UI](https://basecoatui.com) — komponenty (`btn`, `card`, `sidebar`, …)
-2. **Utility Tailwind** — tylko to, co jest w safelist / `src/apps/`
-3. **App shell** — wspólny layout `.app-*` (sidebar + main, stack, card grid, auth page, …)
+1. Basecoat UI + the shared `.app-*` shell CSS
+2. Basecoat component JavaScript
+3. HTMX
+4. Alpine.js
 
-Repo: **https://github.com/mikolaj92/basecoat-factory** (public)
+Application hosts do not install this package and do not link these files from a CDN.
+They install `app-factory[platform]`, extend `app_factory/product_shell.html`, and let
+app-factory serve every asset from `/static/platform/`.
 
-Aplikacje (**rnkstr**, **wolnyrolnik**, **emitype**, …) **nie potrzebują**:
+## Platform compatibility
 
-- npm / Tailwind w apce
-- lokalnego `app-shell.css` / `basecoat-full.css`
+The current app-factory COMPAT row is:
 
-Tylko link z **jsDelivr**.
+| Component | Pin |
+|-----------|-----|
+| app-factory | `v0.5.19` |
+| my-auth | `v0.3.23` |
+| my-usermanager | `v0.4.5` |
+| basecoat-css / this asset bundle | `1.0.2` |
+| HTMX | `2.0.10` |
+| Alpine.js | `3.15.12` |
 
-## Consumer
-
-### jsDelivr — pinuj tag
+Host templates use the platform shell instead of copying chrome:
 
 ```html
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/mikolaj92/basecoat-factory@v0.2.0/dist/basecoat-factory.min.css"
-/>
-<script
-  src="https://cdn.jsdelivr.net/gh/mikolaj92/basecoat-factory@v0.2.0/dist/basecoat-js.min.js"
-  defer
-></script>
+{% extends "app_factory/product_shell.html" %}
+{% block content %}…{% endblock %}
 ```
 
-| Plik | URL |
-|------|-----|
-| CSS | `https://cdn.jsdelivr.net/gh/mikolaj92/basecoat-factory@v0.2.0/dist/basecoat-factory.min.css` |
-| JS | `https://cdn.jsdelivr.net/gh/mikolaj92/basecoat-factory@v0.2.0/dist/basecoat-js.min.js` |
+app-factory renders these same-origin assets:
 
-Pinuj **`@v0.2.0`**, nie `@main`.
+```text
+/static/platform/basecoat-factory.min.css
+/static/platform/basecoat-js.min.js
+/static/platform/htmx.min.js
+/static/platform/alpine.min.js
+```
 
-### Co jest w CSS
+Do not add host-local shell, theme, locale, session, login, account, or admin chrome.
+Those surfaces and asset tags belong to app-factory's `product_shell` contract.
 
-| Warstwa | Przykłady |
-|---------|-----------|
-| Basecoat | `btn`, `card`, `input`, `sidebar`, `dialog`, … |
-| Utility (safelist) | `flex`, `gap-2`, `mt-4`, `text-sm`, `grid-cols-3`, … |
-| App shell (wspólne) | `app-shell`, `app-main`, `app-stack`, `app-card-grid--3`, `app-nav-link`, `app-state-page`, … |
-
-Alias layoutu: `factory-shell` / `factory-main` / `factory-stack` = te same reguły co `app-*` (opcjonalnie).
-
-**W apce nie trzymaj** drugiego `static/css/app-shell.css` — będzie dublowanie.
-
-## Build (tylko to repo)
+## Build (maintainers only)
 
 ```bash
-npm install
-make build
-git add dist/ && git commit -m "build: refresh dist"
-git tag v0.2.1 && git push origin main --tags
+npm ci
+npm test
 ```
 
-### Nowe utility w apkach
+`npm test` rebuilds `dist/` and verifies that all four runtime assets are present and
+that their dependency versions match the COMPAT row. Commit generated `dist/` files
+with source and lockfile changes; app-factory then vendors them into its package.
 
-1. Dopisz klasę do `src/safelist.html` **albo** wrzuć HTML pod `src/apps/`.
-2. `make build` → commit `dist/` + nowy tag.
-3. W apkach bump pin + SRI.
+### Changing the shared shell
 
-### Zmiana layoutu shell
-
-Edytuj `src/app-shell.css` (nie w rnkstr/wolnyrolnik).
-
-## Co to NIE jest
-
-- Nie cały Tailwind na CDN.
-- Nie Play CDN (`cdn.tailwindcss.com`).
-- Nie `make css` w każdej apce.
+Edit `src/app-shell.css`, rebuild, and refresh the vendored assets in app-factory.
+Consumer applications must not keep a second `static/css/app-shell.css` or vendor
+Basecoat, HTMX, or Alpine independently.
 
 ## Rozmiar
 

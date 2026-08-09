@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Platform asset smoke</title>
+    <link rel="stylesheet" href="/dist/basecoat-factory.min.css">
+    <script src="/dist/basecoat-js.min.js" defer></script>
+    <script src="/dist/htmx.min.js" defer></script>
+    <script src="/dist/alpine.min.js" defer></script>
+  </head>
+  <body>
+    <main class="app-shell app-state-page">
+      <section class="card app-state-page__card" x-data="{ ready: true }">
+        <h1>Platform shell</h1>
+        <button class="btn" data-variant="default" x-show="ready">Ready</button>
+      </section>
+    </main>
+  </body>
+</html>
