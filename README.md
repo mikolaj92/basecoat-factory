@@ -14,14 +14,15 @@ app-factory serve every asset from `/static/platform/`.
 
 ## Platform compatibility
 
-The current app-factory COMPAT row is:
+The current coordinated compatibility row is:
 
 | Component | Pin |
 |-----------|-----|
 | app-factory | `v0.5.19` |
 | my-auth | `v0.3.23` |
 | my-usermanager | `v0.4.5` |
-| basecoat-css / this asset bundle | `1.0.2` |
+| basecoat-css | `1.0.2` |
+| Tailwind CSS / CLI | `4.3.3` |
 | HTMX | `2.0.10` |
 | Alpine.js | `3.15.12` |
 
@@ -51,9 +52,11 @@ npm ci
 npm test
 ```
 
-`npm test` rebuilds `dist/` and verifies that all four runtime assets are present and
-that their dependency versions match the COMPAT row. Commit generated `dist/` files
-with source and lockfile changes; app-factory then vendors them into its package.
+`npm test` rebuilds `dist/`, verifies the exact package and lockfile pins above,
+checks each generated asset against `dist/MANIFEST.json`, preserves third-party
+notices, and runs Chromium against the same-origin `/static/platform/` paths.
+Commit generated `dist/` files with source and lockfile changes; app-factory then
+vendors them into its package.
 
 ### Changing the shared shell
 

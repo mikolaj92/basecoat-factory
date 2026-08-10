@@ -1,0 +1,18 @@
+basecoat-factory bundled platform assets
+
+- basecoat-css 1.0.2 — MIT
+  https://github.com/hunvreus/basecoat
+  License: licenses/basecoat-css.LICENSE
+- htmx.org 2.0.10 — Zero-Clause BSD
+  https://github.com/bigskysoftware/htmx
+  License: licenses/htmx.LICENSE
+- alpinejs 3.15.12 — MIT
+  Copyright © 2019-2025 Caleb Porzio and contributors
+  https://github.com/alpinejs/alpine
+  License: licenses/alpine.LICENSE
+- tailwindcss 4.3.3 (build-time; incorporated into CSS) — MIT
+  Copyright (c) Tailwind Labs, Inc.
+  https://github.com/tailwindlabs/tailwindcss
+  License: licenses/tailwindcss.LICENSE
+
+Exact asset versions, package source paths, and SHA-384 integrity values are recorded in MANIFEST.json.
