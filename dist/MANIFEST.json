@@ -1,0 +1,26 @@
+{
+  "alpine": {
+    "filename": "alpine.min.js",
+    "integrity": "sha384-pb6hrQvo4s23cEUFtj0CZkzGE3jyK3pj26RIupXXxhSrrcUA/Cn0lZgcCrGH0t6L",
+    "source": "node_modules/alpinejs/dist/cdn.min.js",
+    "version": "3.15.12"
+  },
+  "basecoat-css": {
+    "filename": "basecoat-factory.min.css",
+    "integrity": "sha384-Ql0IeN0RoFWsNdPTaE7gRqcy4Q31OcomrvAonD+yA2Uaoe0d52T/qY+9OwWeoB8u",
+    "source": "src/input.css (Tailwind source(none) + explicit @source directives)",
+    "version": "1.0.2"
+  },
+  "basecoat-js-all": {
+    "filename": "basecoat-js.min.js",
+    "integrity": "sha384-rD2ZCuReXV7nIneJcn1lsTn6yOv87YARLQyUsemVAxrYYHdy5hcAW8XZEQxx87Dj",
+    "source": "node_modules/basecoat-css/dist/js/all.min.js",
+    "version": "1.0.2"
+  },
+  "htmx": {
+    "filename": "htmx.min.js",
+    "integrity": "sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V",
+    "source": "node_modules/htmx.org/dist/htmx.min.js",
+    "version": "2.0.10"
+  }
+}

@@ -5,10 +5,10 @@
   - Shared app shell layout (.app-*)
 
   Build: npm run build  →  dist/basecoat-factory.min.css
-  Consumers only link dist (jsDelivr). No npm / Tailwind in apps.
+  Consumers only link dist (not jsDelivr). No npm / Tailwind in apps.
 */
 
-@import "tailwindcss";
+@import "tailwindcss" source(none);
 @import "basecoat-css";
 @import "./app-shell.css";
 

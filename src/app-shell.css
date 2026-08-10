@@ -1,10 +1,8 @@
 /*! App shell — layout for Basecoat sidebar + main.
  *
- * Lives here (factory), not in each app. Consumers use classes like
- * .app-shell / .app-main / .app-stack — no local app-shell.css.
- *
- * Basecoat owns .sidebar. Tailwind utilities come from safelist + @import.
- * This file is only the app chrome we share across rnkstr / wolnyrolnik / emitype.
+ * Lives here (factory), not in each app. No local Tailwind/npm in products.
+ * UI components: Basecoat. Layout: shipped .app-* primitives + safelist utilities.
+ * Basecoat owns .sidebar / .card / .btn / .table / .table-container / .field …
  */
 
 html,
@@ -13,25 +11,21 @@ body {
   margin: 0;
 }
 
-.app-shell,
-.factory-shell {
+.app-shell {
   min-height: 100vh;
   overflow-x: hidden;
 }
 
-/* Main column beside fixed basecoat sidebar */
-.app-main,
-.factory-main {
+/* Main column; Basecoat owns sidebar-side and visibility margins. */
+.app-main {
   display: flex;
   min-width: 0;
   min-height: 100vh;
+  flex: 1 1 auto;
   flex-direction: column;
-  margin-left: var(--sidebar-width, 16rem);
-  width: calc(100% - var(--sidebar-width, 16rem));
 }
 
-.app-main-content,
-.factory-main-content {
+.app-main-content {
   position: relative;
   min-width: 0;
   min-height: 0;
@@ -40,8 +34,7 @@ body {
   overflow-y: auto;
 }
 
-.app-content-inner,
-.factory-content {
+.app-content-inner {
   box-sizing: border-box;
   width: 100%;
   max-width: 64rem;
@@ -116,6 +109,33 @@ html.dark .theme-toggle-icon--dark {
   margin-inline-start: auto;
 }
 
+.platform-header-user {
+  min-width: 0;
+  max-width: 14rem;
+  gap: 0.5rem;
+}
+
+.platform-avatar {
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--platform-avatar-bg);
+  color: var(--platform-avatar-fg);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.platform-header-user__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .app-header__loading {
   display: inline-flex;
   flex: 0 0 auto;
@@ -145,12 +165,18 @@ html.dark .theme-toggle-icon--dark {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
   height: 100%;
 }
 
 .app-sidebar__scroll {
   overflow-y: auto;
   flex: 1 1 auto;
+}
+
+/* Flat menus sit outside Basecoat [role=group]; keep the same inset. */
+.app-sidebar__scroll > ul {
+  padding: 0.5rem;
 }
 
 .app-sidebar__brand {
@@ -168,10 +194,20 @@ html.dark .theme-toggle-icon--dark {
 
 .app-sidebar__footer {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  flex-direction: column;
+  align-items: stretch;
+  flex-shrink: 0;
+  gap: 0.5rem;
   padding: 0.5rem;
   border-top: 1px solid var(--color-border, #e5e7eb);
+}
+
+.app-sidebar__footer .btn {
+  justify-content: flex-start;
+}
+
+.app-sidebar__footer form {
+  width: 100%;
 }
 
 .app-nav-link {
@@ -283,6 +319,9 @@ html.dark .theme-toggle-icon--dark {
 /* Page / stack / grid layout primitives (shared across apps) */
 .app-page {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
   width: 100%;
   max-width: 100%;
   margin-inline: auto;
@@ -296,8 +335,7 @@ html.dark .theme-toggle-icon--dark {
   max-width: 72rem;
 }
 
-.app-stack,
-.factory-stack {
+.app-stack {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -307,8 +345,7 @@ html.dark .theme-toggle-icon--dark {
   gap: 0.5rem;
 }
 
-.app-stack--sm,
-.factory-stack-sm {
+.app-stack--sm {
   gap: 0.75rem;
 }
 
@@ -321,8 +358,7 @@ html.dark .theme-toggle-icon--dark {
   gap: 2rem;
 }
 
-.app-header,
-.factory-page-header {
+.app-header {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -335,8 +371,7 @@ html.dark .theme-toggle-icon--dark {
   gap: 1rem;
 }
 
-.app-cluster,
-.factory-cluster {
+.app-cluster {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -405,18 +440,58 @@ html.dark .theme-toggle-icon--dark {
   min-width: 0;
 }
 
-.card > section + section,
-.card > header + section,
-.card > section + footer {
-  margin-top: 0.75rem;
-}
-
 .app-form__field {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   margin-bottom: 0;
 }
+
+/* Generic responsive wrappers for data-heavy and file-intake surfaces. */
+.app-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Basecoat styles target .table; keep bare tables usable inside the wrap. */
+.app-table-wrap > table,
+.app-table-wrap > .table {
+  width: 100%;
+}
+
+.app-dropzone {
+  display: block;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  cursor: pointer;
+  text-align: center;
+  border: 1px dashed var(--color-border, #d1d5db);
+  border-radius: var(--radius-lg, 0.5rem);
+  background: var(--color-card, #fff);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.app-dropzone:hover,
+.app-dropzone:focus-within,
+.app-dropzone[data-dragover="true"] {
+  border-color: var(--color-primary, #2563eb);
+  background: color-mix(in srgb, var(--color-primary, #2563eb) 6%, var(--color-card, #fff));
+}
+
+.app-dropzone:focus-visible {
+  outline: 2px solid var(--color-ring, #2563eb);
+  outline-offset: 2px;
+}
+
+.app-progress {
+  display: block;
+  width: 100%;
+  height: 0.5rem;
+  overflow: hidden;
+  accent-color: var(--color-primary, #2563eb);
+  border: 0;
+  border-radius: 999px;
+}
+
 
 @media (min-width: 48rem) {
   .app-card-grid--2 {
@@ -438,9 +513,7 @@ html.dark .theme-toggle-icon--dark {
 @media (max-width: 767px) {
   .app-sidebar + .app-main,
   .sidebar + .app-main,
-  .sidebar ~ .app-main,
-  .sidebar + .factory-main,
-  .sidebar ~ .factory-main {
+  .sidebar ~ .app-main {
     width: 100%;
     margin-left: 0;
   }
