@@ -18,9 +18,9 @@ The current coordinated compatibility row is:
 
 | Component | Pin |
 |-----------|-----|
-| app-factory | `v0.5.19` |
-| my-auth | `v0.3.23` |
-| my-usermanager | `v0.4.5` |
+| app-factory | `v0.6.10` |
+| my-auth | `v0.4.5` |
+| my-usermanager | `v0.5.6` |
 | basecoat-css | `1.0.2` |
 | Tailwind CSS / CLI | `4.3.3` |
 | HTMX | `2.0.10` |
