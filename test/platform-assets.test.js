@@ -9,11 +9,11 @@ const copiedAssets = {
   "alpine.min.js": "node_modules/alpinejs/dist/cdn.min.js",
 };
 
-const canonicalCssIntegrity = "sha384-Ql0IeN0RoFWsNdPTaE7gRqcy4Q31OcomrvAonD+yA2Uaoe0d52T/qY+9OwWeoB8u";
+const canonicalCssIntegrity = "sha384-XjI5req4tfV0DC7F/QZwxR1NxJIU1qJ0PxuJCWAudmS5/DsNoLcp+TRPqkO4Jd5D";
 
 const integrity = (content) => `sha384-${createHash("sha384").update(content).digest("base64")}`;
 
-test("build matches the app-factory v0.5.19 vendoring contract", async () => {
+test("build matches the coordinated app-factory chrome contract", async () => {
   const manifest = JSON.parse(await readFile(new URL("../dist/MANIFEST.json", import.meta.url)));
   const css = await readFile(new URL("../dist/basecoat-factory.min.css", import.meta.url));
   assert.equal(integrity(css), canonicalCssIntegrity);
