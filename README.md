@@ -54,8 +54,14 @@ Those surfaces and asset tags belong to app-factory's `product_shell` contract.
 
 ```bash
 npm ci
+npx playwright install --with-deps chromium
 npm test
 ```
+
+`npm ci` installs `playwright@1.55.0` from `devDependencies`; it does not
+download the Chromium browser. The install step is the same command CI runs
+before `npm test` (`.github/workflows/test.yml`). Without it, browser smoke
+fails on `chromium.launch`.
 
 `npm test` runs `npm run build` then `node --test`.
 

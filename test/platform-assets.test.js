@@ -73,3 +73,15 @@ test("README names this repo version separately from the basecoat-css pin", asyn
   assert.match(readme, /\| @patryk\/basecoat-factory \| `0\.3\.0` \|/);
   assert.match(readme, /\| basecoat-css \| `1\.0\.2` \|/);
 });
+
+test("README installs Chromium before npm test, matching CI", async () => {
+  const readme = await readFile(new URL("../README.md", import.meta.url), "utf8");
+  const workflow = await readFile(new URL("../.github/workflows/test.yml", import.meta.url), "utf8");
+  const install = "npx playwright install --with-deps chromium";
+  const ciOrder = /npm ci[\s\S]*npx playwright install --with-deps chromium[\s\S]*npm test/;
+  const docsOrder = /npm ci\s*\nnpx playwright install --with-deps chromium\s*\nnpm test/;
+  assert.match(workflow, ciOrder);
+  assert.match(readme, docsOrder);
+  assert.match(readme, /chromium\.launch/);
+  assert.ok(readme.indexOf(install) < readme.indexOf("`npm test` runs"));
+});
