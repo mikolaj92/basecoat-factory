@@ -1,6 +1,6 @@
 {
   "name": "@patryk/basecoat-factory",
-  "version": "1.0.2",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "description": "Prebuilt platform assets for Basecoat, HTMX, Alpine, and Jinja apps",
