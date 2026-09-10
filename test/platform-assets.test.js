@@ -45,6 +45,15 @@ test("COMPAT pins match package and lock metadata", async () => {
   }
 });
 
+test("package version is this repo, not the basecoat-css pin", async () => {
+  const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url)));
+  const lock = JSON.parse(await readFile(new URL("../package-lock.json", import.meta.url)));
+  assert.equal(packageJson.version, "0.3.0");
+  assert.equal(lock.version, "0.3.0");
+  assert.equal(lock.packages[""].version, "0.3.0");
+  assert.notEqual(packageJson.version, packageJson.devDependencies["basecoat-css"]);
+});
+
 test("redistributed Alpine preserves its MIT notice", async () => {
   const notice = await readFile(new URL("../dist/licenses/alpine.LICENSE", import.meta.url), "utf8");
   assert.match(notice, /Copyright © 2019-2025 Caleb Porzio and contributors/);
@@ -56,4 +65,11 @@ test("README documents that MANIFEST and notices are hand-committed", async () =
   assert.doesNotMatch(readme, /preserves third-party notices/);
   assert.match(readme, /does not write `dist\/MANIFEST\.json`/);
   assert.match(readme, /hand-committed artifacts/);
+});
+
+test("README names this repo version separately from the basecoat-css pin", async () => {
+  const readme = await readFile(new URL("../README.md", import.meta.url), "utf8");
+  assert.match(readme, /package version is `0\.3\.0`/);
+  assert.match(readme, /\| @patryk\/basecoat-factory \| `0\.3\.0` \|/);
+  assert.match(readme, /\| basecoat-css \| `1\.0\.2` \|/);
 });

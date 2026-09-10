@@ -12,12 +12,17 @@ Application hosts do not install this package and do not link these files from a
 They install `app-factory[platform]`, extend `app_factory/product_shell.html`, and let
 app-factory serve every asset from `/static/platform/`.
 
+This repo's package version is `0.3.0` (`package.json`; next git tag `v0.3.0`).
+That identifier is **not** the `basecoat-css` pin (`1.0.2`). app-factory vendors the
+built `dist/` files; it does not install `@patryk/basecoat-factory` as a runtime package.
+
 ## Platform compatibility
 
 The current coordinated compatibility row is:
 
 | Component | Pin |
 |-----------|-----|
+| @patryk/basecoat-factory | `0.3.0` |
 | app-factory | `v0.6.10` |
 | my-auth | `v0.4.5` |
 | my-usermanager | `v0.5.6` |
