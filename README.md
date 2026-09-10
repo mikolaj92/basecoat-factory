@@ -52,11 +52,21 @@ npm ci
 npm test
 ```
 
-`npm test` rebuilds `dist/`, verifies the exact package and lockfile pins above,
-checks each generated asset against `dist/MANIFEST.json`, preserves third-party
-notices, and runs Chromium against the same-origin `/static/platform/` paths.
-Commit generated `dist/` files with source and lockfile changes; app-factory then
-vendors them into its package.
+`npm test` runs `npm run build` then `node --test`.
+
+`build` minifies CSS from `src/input.css` and copies the pinned JS files from
+`node_modules` into `dist/`. It does not write `dist/MANIFEST.json`,
+`dist/ATTRIBUTION.txt`, or `dist/licenses/*`; those are hand-committed artifacts.
+
+Tests then verify the package and lockfile pins above, check each generated
+CSS/JS asset against the committed `dist/MANIFEST.json`, assert the committed
+Alpine notice in `dist/licenses/`, and run Chromium against the same-origin
+`/static/platform/` paths. After a JS pin change, refresh MANIFEST integrity
+hashes and license files by hand before committing — tests will not regenerate
+them.
+
+Commit generated `dist/` CSS/JS together with source, lockfile, and any
+MANIFEST/notice updates; app-factory then vendors them into its package.
 
 ### Changing the shared shell
 

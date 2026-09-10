@@ -50,3 +50,10 @@ test("redistributed Alpine preserves its MIT notice", async () => {
   assert.match(notice, /Copyright © 2019-2025 Caleb Porzio and contributors/);
   assert.match(notice, /Permission is hereby granted/);
 });
+
+test("README documents that MANIFEST and notices are hand-committed", async () => {
+  const readme = await readFile(new URL("../README.md", import.meta.url), "utf8");
+  assert.doesNotMatch(readme, /preserves third-party notices/);
+  assert.match(readme, /does not write `dist\/MANIFEST\.json`/);
+  assert.match(readme, /hand-committed artifacts/);
+});
