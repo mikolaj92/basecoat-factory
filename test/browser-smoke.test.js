@@ -25,7 +25,7 @@ async function freePort() {
 test("Chromium exercises app-factory product shell on platform surfaces", async (t) => {
   const port = await freePort();
   const origin = `http://127.0.0.1:${port}`;
-  const server = spawn("uv", ["run", "--with", "uvicorn", "--with", "app-factory[platform] @ git+https://github.com/mikolaj92/app-factory@v0.5.19", "python", "test/platform_app.py", "--port", String(port)], {
+  const server = spawn("uv", ["run", "--with", "uvicorn", "--with", "app-factory[platform] @ git+https://github.com/mikolaj92/app-factory@v0.6.12", "python", "test/platform_app.py", "--port", String(port)], {
     stdio: ["ignore", "pipe", "pipe"],
   });
   t.after(() => server.kill());
@@ -45,7 +45,17 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
   t.after(() => browser.close());
   const page = await browser.newPage();
   const browserRequests = [];
+  const assetResponses = [];
+  const browserErrors = [];
   page.on("request", (request) => browserRequests.push(request.url()));
+  page.on("response", (response) => {
+    if (platformAssets.has(new URL(response.url()).pathname.split("/").pop()))
+      assetResponses.push(response.status());
+  });
+  page.on("console", (message) => {
+    if (message.type() === "error") browserErrors.push(message.text());
+  });
+  page.on("pageerror", (error) => browserErrors.push(error.message));
 
   await page.goto(`${origin}/login`);
   assert.equal(await page.locator('[data-surface="login"] h1').textContent(), "Login");
@@ -73,7 +83,13 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
   assert.equal(await page.evaluate(() => typeof window.htmx), "object");
   assert.equal(await page.evaluate(() => typeof window.Alpine), "object");
 
-  for (const filename of platformAssets)
+  for (const filename of platformAssets) {
     assert.ok(browserRequests.includes(`${origin}/static/platform/${filename}`), `${filename} was not requested from the production path`);
+    const asset = page.locator(`[src="/static/platform/${filename}"], [href="/static/platform/${filename}"]`);
+    assert.match(await asset.getAttribute("integrity"), /^sha384-\S+$/);
+  }
+  assert.ok(assetResponses.length >= platformAssets.size);
+  assert.ok(assetResponses.every((status) => status === 200), "a local platform asset failed to load");
+  assert.deepEqual(browserErrors, []);
   assert.ok(browserRequests.every((url) => new URL(url).origin === origin), "the canonical shell made a cross-origin request");
 });

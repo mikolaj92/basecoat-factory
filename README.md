@@ -18,14 +18,17 @@ built `dist/` files; it does not install `@patryk/basecoat-factory` as a runtime
 
 ## Platform compatibility
 
-The current coordinated compatibility row is:
+The preferred coordinated compatibility row below is verified against
+[app-factory v0.6.12 COMPAT.md](https://github.com/mikolaj92/app-factory/blob/v0.6.12/COMPAT.md).
+Source commit: `b764a35aaa8a9d0d1cea034ef044baa9563c6244`.
+Preferred BOM: the row below. Tested browser smoke: published Git tag `v0.6.12`.
 
 | Component | Pin |
 |-----------|-----|
 | @patryk/basecoat-factory | `0.3.0` |
-| app-factory | `v0.6.10` |
-| my-auth | `v0.4.5` |
-| my-usermanager | `v0.5.6` |
+| app-factory | `v0.6.12` |
+| my-auth | `v0.4.6` |
+| my-usermanager | `v0.5.8` |
 | basecoat-css | `1.0.2` |
 | Tailwind CSS / CLI | `4.3.3` |
 | HTMX | `2.0.10` |
@@ -52,7 +55,10 @@ Those surfaces and asset tags belong to app-factory's `product_shell` contract.
 
 ## Build (maintainers only)
 
+Use Node 22 and uv 0.11.20, matching CI.
+
 ```bash
+uv run --with uvicorn --with "app-factory[platform] @ git+https://github.com/mikolaj92/app-factory@v0.6.12" python --version
 npm ci
 npx playwright install --with-deps chromium
 npm test
@@ -72,9 +78,9 @@ fails on `chromium.launch`.
 Tests then verify the package and lockfile pins above, check each generated
 CSS/JS asset against the committed `dist/MANIFEST.json`, assert the committed
 Alpine notice in `dist/licenses/`, and run Chromium against the same-origin
-`/static/platform/` paths. After a JS pin change, refresh MANIFEST integrity
-hashes and license files by hand before committing — tests will not regenerate
-them.
+`/static/platform/` paths with SRI. After a CSS rebuild or JS pin change,
+refresh MANIFEST integrity hashes and license files by hand before committing —
+tests will not regenerate them.
 
 Commit generated `dist/` CSS/JS together with source, lockfile, and any
 MANIFEST/notice updates; app-factory then vendors them into its package.

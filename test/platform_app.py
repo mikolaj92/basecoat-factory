@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse
 from jinja2 import DictLoader, Environment
 
@@ -13,6 +14,8 @@ from app_factory.jinja import configure_jinja_env
 from app_factory.platform import MenuGroup, MenuItem, PlatformConfig, PlatformPaths, PlatformUser, build_platform_context
 
 ROOT = Path(__file__).resolve().parents[1]
+ASSETS = json.loads((ROOT / "dist" / "MANIFEST.json").read_text())
+LOCAL_ASSETS = {entry["filename"] for entry in ASSETS.values()}
 USER = PlatformUser(display_name="Ada Lovelace", is_admin=True, user_id="ada")
 CONFIG = PlatformConfig(
     app_name="Platform smoke",
@@ -37,7 +40,11 @@ app = FastAPI()
 
 def render(request: Request, template: str, *, user: PlatformUser | None, title: str, nav: str) -> HTMLResponse:
     context = build_platform_context(CONFIG, user=user, current_path=request.url.path)
-    return HTMLResponse(environment.get_template(template).render(**context, page_title=title, nav_active=nav))
+    html = environment.get_template(template).render(**context, page_title=title, nav_active=nav)
+    for entry in ASSETS.values():
+        url = f'="/static/platform/{entry["filename"]}"'
+        html = html.replace(url, f'{url} integrity="{entry["integrity"]}" crossorigin="anonymous"')
+    return HTMLResponse(html)
 
 
 @app.get("/login", response_class=HTMLResponse)
@@ -57,8 +64,12 @@ def admin(request: Request) -> HTMLResponse:
 
 @app.get("/static/platform/{filename}")
 def platform_asset(filename: str) -> FileResponse:
-    local = ROOT / "dist" / filename
-    return FileResponse(local if local.is_file() else get_assets_dir() / filename)
+    if filename in LOCAL_ASSETS:
+        local = ROOT / "dist" / filename
+        if not local.is_file():
+            raise HTTPException(status_code=404)
+        return FileResponse(local)
+    return FileResponse(get_assets_dir() / filename)
 
 
 @app.get("/health")
