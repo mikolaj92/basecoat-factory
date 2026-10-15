@@ -25,7 +25,7 @@ async function freePort() {
 test("Chromium exercises app-factory product shell on platform surfaces", async (t) => {
   const port = await freePort();
   const origin = `http://127.0.0.1:${port}`;
-  const server = spawn("uv", ["run", "--with", "uvicorn", "--with", "app-factory[platform] @ git+https://github.com/mikolaj92/app-factory@v0.5.19", "python", "test/platform_app.py", "--port", String(port)], {
+  const server = spawn("python", ["test/platform_app.py", "--port", String(port)], {
     stdio: ["ignore", "pipe", "pipe"],
   });
   t.after(() => server.kill());
