@@ -18,6 +18,7 @@
     "alpinejs": "3.15.12",
     "basecoat-css": "1.0.2",
     "htmx.org": "2.0.10",
+    "node": "22.23.3",
     "playwright": "1.55.0",
     "tailwindcss": "4.3.3"
   }
