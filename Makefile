@@ -3,7 +3,7 @@
 install: ## Install build deps (only in this repo)
 	npm ci
 
-build: ## Produce dist/basecoat-factory.min.css
+build:
 	npm run build
 	@ls -la dist/
 	@echo "---"
@@ -14,6 +14,6 @@ watch: ## Rebuild on safelist/input changes
 	npm run watch
 
 clean:
-	rm -rf node_modules dist/*.css
+	rm -rf node_modules dist/*.css dist/*.js
 
 size: build
