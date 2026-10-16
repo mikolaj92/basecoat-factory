@@ -9,7 +9,8 @@
     "build:css": "tailwindcss -i ./src/input.css -o ./dist/basecoat-factory.min.css --minify",
     "build:dev": "tailwindcss -i ./src/input.css -o ./dist/basecoat-factory.css",
     "build:js": "mkdir -p dist && cp node_modules/basecoat-css/dist/js/all.min.js dist/basecoat-js.min.js && cp node_modules/htmx.org/dist/htmx.min.js dist/htmx.min.js && cp node_modules/alpinejs/dist/cdn.min.js dist/alpine.min.js",
-    "test": "npm run build && node --test",
+    "pretest": "PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=30000 playwright install chromium",
+    "test": "npm run build && uv run --with uvicorn --with 'app-factory[platform] @ git+https://github.com/mikolaj92/app-factory@v0.6.12' node --test",
     "watch": "tailwindcss -i ./src/input.css -o ./dist/basecoat-factory.min.css --watch"
   },
   "devDependencies": {
@@ -17,6 +18,7 @@
     "alpinejs": "3.15.12",
     "basecoat-css": "1.0.2",
     "htmx.org": "2.0.10",
+    "node": "22.23.3",
     "playwright": "1.55.0",
     "tailwindcss": "4.3.3"
   }
