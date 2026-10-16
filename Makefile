@@ -1,7 +1,7 @@
 .PHONY: install build watch clean size
 
 install: ## Install build deps (only in this repo)
-	npm install
+	npm ci
 
 build: ## Produce dist/basecoat-factory.min.css
 	npm run build

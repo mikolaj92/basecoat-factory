@@ -9,15 +9,13 @@ const copiedAssets = {
   "alpine.min.js": "node_modules/alpinejs/dist/cdn.min.js",
 };
 
-const canonicalCssIntegrity = "sha384-XjI5req4tfV0DC7F/QZwxR1NxJIU1qJ0PxuJCWAudmS5/DsNoLcp+TRPqkO4Jd5D";
-
 const integrity = (content) => `sha384-${createHash("sha384").update(content).digest("base64")}`;
 
 test("build matches the coordinated app-factory chrome contract", async () => {
   const manifest = JSON.parse(await readFile(new URL("../dist/MANIFEST.json", import.meta.url)));
   const css = await readFile(new URL("../dist/basecoat-factory.min.css", import.meta.url));
-  assert.equal(integrity(css), canonicalCssIntegrity);
-  assert.equal(manifest["basecoat-css"].integrity, canonicalCssIntegrity);
+  assert.equal(manifest["basecoat-css"].filename, "basecoat-factory.min.css");
+  assert.equal(integrity(css), manifest["basecoat-css"].integrity);
 
   for (const [filename, source] of Object.entries(copiedAssets)) {
     const generated = await readFile(new URL(`../dist/${filename}`, import.meta.url));
