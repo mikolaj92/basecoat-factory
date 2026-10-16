@@ -63,12 +63,12 @@ def admin(request: Request) -> HTMLResponse:
 
 @app.get("/static/platform/{filename}")
 def platform_asset(filename: str) -> FileResponse:
-    if filename in LOCAL_ASSETS:
-        local = ROOT / "dist" / filename
-        if not local.is_file():
-            raise HTTPException(status_code=404)
-        return FileResponse(local)
-    raise HTTPException(status_code=404)
+    if filename not in LOCAL_ASSETS:
+        raise HTTPException(status_code=404)
+    local = ROOT / "dist" / filename
+    if not local.is_file():
+        raise HTTPException(status_code=404)
+    return FileResponse(local)
 
 
 @app.get("/health")

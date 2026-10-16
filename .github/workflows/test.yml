@@ -16,7 +16,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           version: "0.11.20"
-      - run: uv run --with uvicorn --with "app-factory[platform] @ git+https://github.com/mikolaj92/app-factory@v0.5.18" python --version
+      - run: uv run --with uvicorn --with "app-factory[platform] @ git+https://github.com/mikolaj92/app-factory@v0.6.12" python --version
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm test

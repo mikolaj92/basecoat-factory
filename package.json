@@ -8,9 +8,9 @@
     "build": "npm run build:css && npm run build:js",
     "build:css": "tailwindcss -i ./src/input.css -o ./dist/basecoat-factory.min.css --minify",
     "build:dev": "tailwindcss -i ./src/input.css -o ./dist/basecoat-factory.css",
-    "build:js": "mkdir -p dist && cp node_modules/basecoat-css/dist/js/all.min.js dist/basecoat-js.min.js && cp node_modules/htmx.org/dist/htmx.min.js dist/htmx.min.js && cp node_modules/alpinejs/dist/cdn.min.js dist/alpine.min.js",
+    "build:js": "mkdir -p dist && cp node_modules/basecoat-css/dist/js/all.min.js dist/basecoat-js.min.js && cp node_modules/htmx.org/dist/htmx.min.js dist/htmx.min.js && cp node_modules/alpinejs/dist/cdn.min.js dist/alpine.min.js && cp src/material-symbols/material-symbols.css src/material-symbols/material-symbols-outlined.woff2 dist/ && cp src/material-symbols/LICENSE dist/licenses/material-symbols.LICENSE",
     "pretest": "PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=30000 playwright install chromium",
-    "test": "npm run build && uv run --with uvicorn --with 'app-factory[platform] @ git+https://github.com/mikolaj92/app-factory@v0.5.18' node --test",
+    "test": "npm run build && uv run --with uvicorn --with 'app-factory[platform] @ git+https://github.com/mikolaj92/app-factory@v0.6.12' node --test",
     "watch": "tailwindcss -i ./src/input.css -o ./dist/basecoat-factory.min.css --watch"
   },
   "devDependencies": {
