@@ -7,7 +7,7 @@
   },
   "basecoat-css": {
     "filename": "basecoat-factory.min.css",
-    "integrity": "sha384-PwOW6TERNCvETfJWPh0dn3HPn3eJ6cov1S06DjHlnLzvLU+9y71b5jBlkOjmzdEF",
+    "integrity": "sha384-XjI5req4tfV0DC7F/QZwxR1NxJIU1qJ0PxuJCWAudmS5/DsNoLcp+TRPqkO4Jd5D",
     "source": "src/input.css (Tailwind scan + explicit @source directives)",
     "version": "1.0.2"
   },
