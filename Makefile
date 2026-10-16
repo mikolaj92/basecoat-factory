@@ -3,7 +3,7 @@
 install: ## Install build deps (only in this repo)
 	npm ci
 
-build:
+build: ## Produce CSS and copy JavaScript bundles into dist/
 	npm run build
 	@ls -la dist/
 	@echo "---"
