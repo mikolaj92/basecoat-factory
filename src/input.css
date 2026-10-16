@@ -17,7 +17,6 @@
 @source "./apps/**/*.html";
 
 
-/* app-factory light palette: warm paper, never clinical white. Dark remains Basecoat. */
 html[data-theme="light"] {
   --background: oklch(0.96 0.018 88);
   --foreground: oklch(0.24 0.018 70);
@@ -44,8 +43,5 @@ html[data-theme="light"] {
   --sidebar-accent-foreground: oklch(0.29 0.025 70);
   --sidebar-border: oklch(0.83 0.028 82);
   --sidebar-ring: oklch(0.60 0.065 72);
-}
-
-html[data-theme="light"] {
   color-scheme: light;
 }
