@@ -75,7 +75,9 @@ fails on `chromium.launch`.
 `node_modules` into `dist/`. It does not write `dist/MANIFEST.json`,
 `dist/ATTRIBUTION.txt`, or `dist/licenses/*`; those are hand-committed artifacts.
 
-Tests then verify the package and lockfile pins above, check each generated
+Tests compare the five npm pins in README with package and lockfile metadata
+and the README app-factory pin with the smoke installation. They do not verify
+my-auth or my-usermanager pins. They also check each generated
 CSS/JS asset against the committed `dist/MANIFEST.json`, assert the committed
 Alpine notice in `dist/licenses/`, and run Chromium against the same-origin
 `/static/platform/` paths with SRI. After a CSS rebuild or JS pin change,

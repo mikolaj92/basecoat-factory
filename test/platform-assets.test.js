@@ -27,20 +27,28 @@ test("build matches the coordinated app-factory chrome contract", async () => {
   }
 });
 
-test("COMPAT pins match package and lock metadata", async () => {
+test("README npm pins match package and lock metadata; app-factory matches the smoke install pin", async () => {
   const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url)));
   const lock = JSON.parse(await readFile(new URL("../package-lock.json", import.meta.url)));
-  const pins = {
-    "@tailwindcss/cli": "4.3.3",
-    tailwindcss: "4.3.3",
-    "basecoat-css": "1.0.2",
-    "htmx.org": "2.0.10",
-    alpinejs: "3.15.12",
-  };
-  for (const [name, version] of Object.entries(pins)) {
+  const readme = await readFile(new URL("../README.md", import.meta.url), "utf8");
+  const readmePins = new Map([...readme.matchAll(/^\| ([^|]+?) \| `([^`]+)` \|\s*$/gm)]
+    .map(([, name, version]) => [name, version]));
+  const pins = [
+    ["@tailwindcss/cli", "Tailwind CSS / CLI", "4.3.3"],
+    ["tailwindcss", "Tailwind CSS / CLI", "4.3.3"],
+    ["basecoat-css", "basecoat-css", "1.0.2"],
+    ["htmx.org", "HTMX", "2.0.10"],
+    ["alpinejs", "Alpine.js", "3.15.12"],
+  ];
+  for (const [name, component, version] of pins) {
+    assert.equal(readmePins.get(component), version, `README pin for ${component}`);
     assert.equal(packageJson.devDependencies[name], version);
+    assert.equal(lock.packages[""].devDependencies[name], version);
     assert.equal(lock.packages[`node_modules/${name}`].version, version);
   }
+  const smokePin = packageJson.scripts.test.match(/app-factory\[platform\] @ git\+https:\/\/github\.com\/mikolaj92\/app-factory@([^\s'"]+)/);
+  assert.ok(smokePin, "npm test must install a pinned app-factory for browser smoke");
+  assert.equal(readmePins.get("app-factory"), smokePin[1], "README app-factory pin must match the smoke install pin");
 });
 
 test("package version is this repo, not the basecoat-css pin", async () => {
