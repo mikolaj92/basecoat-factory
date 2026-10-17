@@ -60,10 +60,36 @@ test("package version is this repo, not the basecoat-css pin", async () => {
   assert.notEqual(packageJson.version, packageJson.devDependencies["basecoat-css"]);
 });
 
-test("redistributed Alpine preserves its MIT notice", async () => {
-  const notice = await readFile(new URL("../dist/licenses/alpine.LICENSE", import.meta.url), "utf8");
-  assert.match(notice, /Copyright © 2019-2025 Caleb Porzio and contributors/);
-  assert.match(notice, /Permission is hereby granted/);
+test("redistributed licenses preserve their required notices and grants", async () => {
+  const mitGrant = /Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files \(the "Software"\), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and\/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:/;
+  const licenses = {
+    "licenses/alpine.LICENSE": [
+      /Copyright © 2019-2025 Caleb Porzio and contributors/,
+      mitGrant,
+    ],
+    "licenses/basecoat-css.LICENSE": [
+      /Copyright \(c\) 2025 Ronan Berder/,
+      mitGrant,
+    ],
+    "licenses/htmx.LICENSE": [
+      /Zero-Clause BSD/,
+      /Permission to use, copy, modify, and\/or distribute this software for any purpose with or without fee is hereby granted\./,
+    ],
+    "licenses/tailwindcss.LICENSE": [
+      /Copyright \(c\) Tailwind Labs, Inc\./,
+      mitGrant,
+    ],
+  };
+  const attribution = await readFile(new URL("../dist/ATTRIBUTION.txt", import.meta.url), "utf8");
+  const paths = [...attribution.matchAll(/^\s*License: (\S+)\s*$/gm)].map(([, path]) => path);
+  assert.deepEqual(paths.sort(), Object.keys(licenses).sort());
+
+  for (const path of paths) {
+    const notice = await readFile(new URL(`../dist/${path}`, import.meta.url), "utf8");
+    for (const fragment of licenses[path]) {
+      assert.match(notice.replace(/\s+/g, " "), fragment, path);
+    }
+  }
 });
 
 test("README documents that MANIFEST and notices are hand-committed", async () => {
