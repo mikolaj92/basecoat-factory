@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { once } from "node:events";
+import { link, mkdtemp, readFile, rename, rmdir, unlink } from "node:fs/promises";
+import { join } from "node:path";
 import { chromium } from "playwright";
 import test from "node:test";
 
@@ -40,6 +42,34 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
     await new Promise((resolve) => setTimeout(resolve, 100));
     if (attempt === 99) assert.fail(`platform test server did not start: ${stderr}`);
   }
+
+  for (const filename of platformAssets) {
+    const response = await fetch(`${origin}/static/platform/${filename}`, { cache: "no-store" });
+    assert.equal(response.status, 200, filename);
+    assert.deepEqual(Buffer.from(await response.arrayBuffer()), await readFile(new URL(`../dist/${filename}`, import.meta.url)), filename);
+  }
+  for (const path of ["missing.js", "..%2fREADME.md", "%2e%2e%2fREADME.md"]) {
+    assert.equal((await fetch(`${origin}/static/platform/${path}`, { cache: "no-store" })).status, 404, path);
+  }
+
+  const alpine = new URL("../dist/alpine.min.js", import.meta.url);
+  const alpineBytes = await readFile(alpine);
+  const temporary = await mkdtemp(new URL("../.platform-smoke-", import.meta.url));
+  const backup = join(temporary, "alpine.min.js");
+  let moved = false;
+  try {
+    await rename(alpine, backup);
+    moved = true;
+    const response = await fetch(`${origin}/static/platform/alpine.min.js`, { cache: "no-store" });
+    assert.equal(response.status, 404, "missing local Alpine must not fall back to app-factory");
+  } finally {
+    if (moved) {
+      await link(backup, alpine);
+      await unlink(backup);
+    }
+    await rmdir(temporary);
+  }
+  assert.deepEqual(await readFile(alpine), alpineBytes, "Alpine must be restored before browser interactions");
 
   const browser = await chromium.launch({ headless: true });
   t.after(() => browser.close());
