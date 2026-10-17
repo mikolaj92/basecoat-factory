@@ -77,12 +77,11 @@ fails on `chromium.launch`.
 
 Tests compare the five npm pins in README with package and lockfile metadata
 and the README app-factory pin with the smoke installation. They do not verify
-my-auth or my-usermanager pins. They also check each generated
-CSS/JS asset against the committed `dist/MANIFEST.json`, assert the committed
-Alpine notice in `dist/licenses/`, and run Chromium against the same-origin
-`/static/platform/` paths with SRI. After a CSS rebuild or JS pin change,
-refresh MANIFEST integrity hashes and license files by hand before committing —
-tests will not regenerate them.
+my-auth or my-usermanager pins. They check generated CSS/JS against the committed
+`dist/MANIFEST.json` and license notices, then run Chromium with SRI.
+Smoke serves only local `dist/` at `/static/platform/` and compares response bytes.
+Missing files return 404; missing `dist/` prevents startup. Symlinks cannot escape it.
+After rebuilding CSS or changing JS pins, refresh MANIFEST hashes and notices by hand.
 
 Commit generated `dist/` CSS/JS together with source, lockfile, and any
 MANIFEST/notice updates; app-factory then vendors them into its package.
