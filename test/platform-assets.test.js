@@ -81,8 +81,8 @@ test("redistributed licenses preserve their required notices and grants", async 
     ],
   };
   const attribution = await readFile(new URL("../dist/ATTRIBUTION.txt", import.meta.url), "utf8");
-  const paths = new Set([...attribution.matchAll(/^\s*License: (\S+)\s*$/gm)].map(([, path]) => path));
-  assert.deepEqual(paths, new Set(Object.keys(licenses)));
+  const paths = [...attribution.matchAll(/^\s*License: (\S+)\s*$/gm)].map(([, path]) => path);
+  assert.deepEqual(paths.sort(), Object.keys(licenses).sort());
 
   for (const path of paths) {
     const notice = await readFile(new URL(`../dist/${path}`, import.meta.url), "utf8");
