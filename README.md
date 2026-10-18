@@ -78,10 +78,10 @@ Tests compare the five npm pins in README with package and lockfile metadata
 and the README app-factory pin with the smoke installation. They do not verify
 my-auth or my-usermanager pins. They check generated CSS/JS against the committed
 `dist/MANIFEST.json` and license notices, then run Chromium with SRI.
-Smoke compares HTTP asset bytes with local `dist/` separately from Chromium use.
+Smoke requires unconditional HTTP 200 responses matching local `dist/` bytes;
+Chromium revalidations may return 304 without proving byte equality.
 Missing files, traversal and escaping symlinks return 404; missing `dist/` blocks startup.
-Alpine returns 404 while removed and is restored before Chromium interactions.
-Only fonts used by visible shell elements require completed browser loading.
+Alpine is restored before repeated Chromium navigation; visible shell fonts must finish loading.
 
 Commit generated `dist/` CSS/JS together with source, lockfile, and any
 MANIFEST/notice updates; app-factory then vendors them into its package.

@@ -106,8 +106,10 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
     if (url.origin === origin && url.pathname.startsWith("/static/platform/")) {
       assetResponses.push(url.href);
       assetChecks.push((async () => {
-        assert.equal(response.status(), 200, `${url.href}: HTTP ${response.status()}`);
-        assert.deepEqual(await response.body(), await readFile(new URL(`../dist/${url.pathname.slice("/static/platform/".length)}`, import.meta.url)), `${url.href}: response differs from local dist`);
+        assert.ok([200, 304].includes(response.status()), `${url.href}: HTTP ${response.status()}`);
+        if (response.status() === 200) {
+          assert.deepEqual(await response.body(), await readFile(new URL(`../dist/${url.pathname.slice("/static/platform/".length)}`, import.meta.url)), `${url.href}: response differs from local dist`);
+        }
       })().catch((error) => browserErrors.push(error.message)));
     }
   });
@@ -136,6 +138,10 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
   assert.equal(await page.locator('[href="/admin"][aria-current="page"]').count(), 1);
   await page.getByRole("button", { name: "Load users" }).click();
   await page.getByText("Users ready").waitFor({ state: "visible" });
+
+  await page.goto(`${origin}/login`);
+  await page.goto(`${origin}/account`);
+  await page.goto(`${origin}/admin`);
 
   const sidebarDisplay = await page.locator("#sidebar").evaluate((element) => getComputedStyle(element).display);
   assert.notEqual(sidebarDisplay, "inline", "platform shell CSS was not applied");
