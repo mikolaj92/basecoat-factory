@@ -1,27 +1,18 @@
 # basecoat-factory
 
 **Maintainer-only build source** for the platform assets bundled by
-[`app-factory`](https://github.com/mikolaj92/app-factory). It produces:
+[`app-factory`](https://github.com/mikolaj92/app-factory): Basecoat UI, shared
+`.app-*` shell CSS, Basecoat JavaScript, HTMX, Alpine.js and Material Symbols.
+Application hosts install `app-factory[platform]`, not this package or CDN assets.
+app-factory vendors `dist/` and serves it from `/static/platform/`.
 
-1. Basecoat UI + the shared `.app-*` shell CSS
-2. Basecoat component JavaScript
-3. HTMX
-4. Alpine.js
-
-Application hosts do not install this package and do not link these files from a CDN.
-They install `app-factory[platform]`, extend `app_factory/product_shell.html`, and let
-app-factory serve every asset from `/static/platform/`.
-
-This repo's package version is `0.3.0` (`package.json`).
-That identifier is **not** the `basecoat-css` pin (`1.0.2`). app-factory vendors the
-built `dist/` files; it does not install `@patryk/basecoat-factory` as a runtime package.
+This repo's package version is `0.3.0`, not the `basecoat-css` pin.
 
 ## Platform compatibility
 
-The preferred coordinated compatibility row below is verified against
-[app-factory v0.6.12 COMPAT.md](https://github.com/mikolaj92/app-factory/blob/v0.6.12/COMPAT.md).
-Source commit: `b764a35aaa8a9d0d1cea034ef044baa9563c6244`.
-The browser smoke installs published Git tag `v0.6.12`.
+[app-factory v0.6.12 COMPAT.md](https://github.com/mikolaj92/app-factory/blob/v0.6.12/COMPAT.md)
+is the coordinated compatibility source at commit `b764a35aaa8a9d0d1cea034ef044baa9563c6244`.
+The browser smoke installs Git tag `v0.6.12`.
 
 | Component | Pin |
 |-----------|-----|
@@ -34,24 +25,10 @@ The browser smoke installs published Git tag `v0.6.12`.
 | HTMX | `2.0.10` |
 | Alpine.js | `3.15.12` |
 
-Host templates use the platform shell instead of copying chrome:
-
-```html
-{% extends "app_factory/product_shell.html" %}
-{% block content %}…{% endblock %}
-```
-
-app-factory renders these same-origin assets:
-
-```text
-/static/platform/basecoat-factory.min.css
-/static/platform/basecoat-js.min.js
-/static/platform/htmx.min.js
-/static/platform/alpine.min.js
-```
-
-Do not add host-local shell, theme, locale, session, login, account, or admin chrome.
-Those surfaces and asset tags belong to app-factory's `product_shell` contract.
+Host templates extend `app_factory/product_shell.html` and fill its `content` block.
+The shell loads `basecoat-factory.min.css`, `basecoat-js.min.js`, `htmx.min.js`
+and `alpine.min.js` from `/static/platform/`.
+Do not copy shell, theme, locale, session, login, account or admin chrome into hosts.
 
 ## Build (maintainers only)
 
@@ -64,33 +41,28 @@ npx playwright install --with-deps chromium
 npm test
 ```
 
-`npm ci` installs `playwright@1.55.0`, not Chromium. CI installs Chromium as above;
-`npm test` also installs it in `pretest` before `chromium.launch`.
+`npm ci` installs Playwright; Chromium is installed separately before `chromium.launch`.
+`pretest` also installs Chromium, without Linux system dependencies.
+`npm test` runs the build, asset checks and browser smoke.
+The build minifies `src/input.css`, copies pinned JavaScript and local Material
+Symbols CSS, font and license, and creates the destination directories.
+It does not write `dist/MANIFEST.json` or `dist/ATTRIBUTION.txt`;
+these and the other licenses are hand-committed artifacts.
 
-`npm test` runs `npm run build` then `node --test`.
-
-`build` minifies `src/input.css`, copies pinned JS from `node_modules`, and copies
-local Material Symbols CSS, font and license into `dist/`, creating directories.
-It does not write `dist/MANIFEST.json` or `dist/ATTRIBUTION.txt`; these and the
-other licenses are hand-committed artifacts.
-
-Tests compare the five npm pins in README with package and lockfile metadata
-and the README app-factory pin with the smoke installation. They do not verify
-my-auth or my-usermanager pins. They check generated CSS/JS against the committed
-`dist/MANIFEST.json` and license notices, then run Chromium with SRI.
-Smoke requires unconditional HTTP 200 responses matching local `dist/` bytes;
-Chromium revalidations may return 304 without proving byte equality.
+Tests check npm pins, the smoke app-factory pin, asset integrity and license notices;
+they do not verify my-auth or my-usermanager pins.
+Smoke mounts only local `dist/` with StaticFiles: no app-factory asset fallback.
 Missing files, traversal and escaping symlinks return 404; missing `dist/` blocks startup.
-Alpine is restored before repeated Chromium navigation; visible shell fonts must finish loading.
+Alpine is temporarily removed, checked for 404 and restored before browser navigation.
+Independent byte comparisons require HTTP 200; Chromium may revalidate with 304.
+Smoke checks login, account, admin, Alpine, HTMX, Basecoat, SRI and same-origin requests.
 
-Commit generated `dist/` CSS/JS together with source, lockfile, and any
-MANIFEST/notice updates; app-factory then vendors them into its package.
+Commit generated `dist/` with source, lockfile and MANIFEST/notice updates for vendoring.
 
 ### Changing the shared shell
 
-Edit `src/app-shell.css`, rebuild, and refresh the vendored assets in app-factory.
-Consumer applications must not keep a second `static/css/app-shell.css` or vendor
-Basecoat, HTMX, or Alpine independently.
+Edit `src/app-shell.css`, rebuild and refresh app-factory's vendored assets.
+Consumers must not keep another `static/css/app-shell.css` or vendor the JS independently.
 
 ## Rozmiar
 
