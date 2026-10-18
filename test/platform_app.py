@@ -14,6 +14,8 @@ from app_factory.jinja import configure_jinja_env
 from app_factory.platform import MenuGroup, MenuItem, PlatformConfig, PlatformPaths, PlatformUser, build_platform_context
 
 ROOT = Path(__file__).resolve().parents[1]
+app = FastAPI()
+app.mount("/static/platform", StaticFiles(directory=ROOT / "dist", follow_symlink=False))
 ASSETS = json.loads((ROOT / "dist" / "MANIFEST.json").read_text())
 USER = PlatformUser(display_name="Ada Lovelace", is_admin=True, user_id="ada")
 CONFIG = PlatformConfig(
@@ -34,8 +36,6 @@ TEMPLATES = {
 {% block content %}<section class="app-page" data-surface="admin" x-data="{ ready: false }"><h1>Admin users</h1><div class="card"><button class="btn" type="button" @click="ready = true">Load users</button><p x-show="ready" x-cloak>Users ready</p></div></section>{% endblock %}""",
 }
 environment = configure_jinja_env(Environment(loader=DictLoader(TEMPLATES), autoescape=True))
-app = FastAPI()
-app.mount("/static/platform", StaticFiles(directory=ROOT / "dist", follow_symlink=False))
 
 
 def render(request: Request, template: str, *, user: PlatformUser | None, title: str, nav: str) -> HTMLResponse:

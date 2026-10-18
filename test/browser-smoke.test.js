@@ -149,10 +149,23 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
     assert.match(await asset.getAttribute("integrity"), /^sha384-\S+$/);
   }
   assert.ok(assetResponses.length >= platformAssets.size);
-  await page.evaluate(() => document.fonts.ready);
+  const usedFonts = await page.evaluate(async () => {
+    const icons = [...document.querySelectorAll("*")].filter((element) =>
+      element.getClientRects().length && getComputedStyle(element).fontFamily.includes("Material Symbols Outlined") && element.textContent.trim());
+    for (const icon of icons) {
+      const style = getComputedStyle(icon);
+      const font = `${style.fontSize} ${style.fontFamily}`;
+      const text = icon.textContent.trim();
+      await document.fonts.load(font, text);
+      if (!document.fonts.check(font, text)) throw new Error(`Font not loaded: ${font}, text: ${text}`);
+    }
+    await document.fonts.ready;
+    return icons.length;
+  });
   await Promise.all(assetChecks);
-  for (const filename of ["material-symbols.css", "material-symbols-outlined.woff2"]) {
-    assert.ok(assetResponses.includes(`${origin}/static/platform/${filename}`), `${filename} was not loaded by the shell`);
+  assert.ok(assetResponses.includes(`${origin}/static/platform/material-symbols.css`), "Material Symbols CSS was not loaded by the shell");
+  if (usedFonts) {
+    assert.ok(assetResponses.includes(`${origin}/static/platform/material-symbols-outlined.woff2`), "Font used by the shell was not loaded");
   }
   assert.deepEqual(browserErrors, []);
   assert.ok(browserRequests.every((url) => new URL(url).origin === origin), "the canonical shell made a cross-origin request");
