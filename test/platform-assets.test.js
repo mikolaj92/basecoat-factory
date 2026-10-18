@@ -10,6 +10,8 @@ test("build matches the coordinated app-factory chrome contract", async () => {
     "basecoat-js.min.js": "node_modules/basecoat-css/dist/js/all.min.js",
     "htmx.min.js": "node_modules/htmx.org/dist/htmx.min.js",
     "alpine.min.js": "node_modules/alpinejs/dist/cdn.min.js",
+    "material-symbols.css": "src/material-symbols/material-symbols.css",
+    "material-symbols-outlined.woff2": "src/material-symbols/material-symbols-outlined.woff2",
   };
   const manifest = JSON.parse(await readFile(new URL("../dist/MANIFEST.json", import.meta.url)));
   const css = await readFile(new URL("../dist/basecoat-factory.min.css", import.meta.url));
@@ -20,7 +22,7 @@ test("build matches the coordinated app-factory chrome contract", async () => {
     const pinnedSource = await readFile(new URL(`../${source}`, import.meta.url));
     assert.deepEqual(generated, pinnedSource, `${filename} differs from ${source}`);
     const entry = Object.values(manifest).find((candidate) => candidate.filename === filename);
-    assert.equal(entry.source, source);
+    assert.equal(entry.source, filename.startsWith("material-symbols") ? `${source} (app-factory v0.6.12)` : source);
     assert.equal(entry.integrity, integrity(generated));
   }
 });
@@ -56,6 +58,10 @@ test("package version is this repo, not the basecoat-css pin", async () => {
   assert.equal(lock.version, "0.3.0");
   assert.equal(lock.packages[""].version, "0.3.0");
   assert.notEqual(packageJson.version, packageJson.devDependencies["basecoat-css"]);
+  const readme = await readFile(new URL("../README.md", import.meta.url), "utf8");
+  assert.match(readme, /package version is `0\.3\.0`/);
+  assert.match(readme, /\| @patryk\/basecoat-factory \| `0\.3\.0` \|/);
+  assert.match(readme, /\| basecoat-css \| `1\.0\.2` \|/);
 });
 
 test("redistributed licenses preserve their required notices and grants", async () => {
@@ -75,7 +81,8 @@ test("redistributed licenses preserve their required notices and grants", async 
     ],
     "licenses/material-symbols.LICENSE": [
       /Apache License Version 2\.0, January 2004/,
-      /You must give any other recipients of the Work or Derivative Works a copy of this License/],
+      /You must give any other recipients of the Work or Derivative Works a copy of this License/,
+    ],
     "licenses/tailwindcss.LICENSE": [
       /Copyright \(c\) Tailwind Labs, Inc\./,
       mitGrant,
@@ -97,13 +104,6 @@ test("README documents that MANIFEST and notices are hand-committed", async () =
   assert.doesNotMatch(readme, /preserves third-party notices/);
   assert.match(readme, /does not write `dist\/MANIFEST\.json`/);
   assert.match(readme, /hand-committed artifacts/);
-});
-
-test("README names this repo version separately from the basecoat-css pin", async () => {
-  const readme = await readFile(new URL("../README.md", import.meta.url), "utf8");
-  assert.match(readme, /package version is `0\.3\.0`/);
-  assert.match(readme, /\| @patryk\/basecoat-factory \| `0\.3\.0` \|/);
-  assert.match(readme, /\| basecoat-css \| `1\.0\.2` \|/);
 });
 
 test("README installs Chromium before npm test, matching CI", async () => {
