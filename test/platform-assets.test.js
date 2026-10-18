@@ -10,8 +10,6 @@ test("build matches the coordinated app-factory chrome contract", async () => {
     "basecoat-js.min.js": "node_modules/basecoat-css/dist/js/all.min.js",
     "htmx.min.js": "node_modules/htmx.org/dist/htmx.min.js",
     "alpine.min.js": "node_modules/alpinejs/dist/cdn.min.js",
-    "material-symbols.css": "src/material-symbols/material-symbols.css",
-    "material-symbols-outlined.woff2": "src/material-symbols/material-symbols-outlined.woff2",
   };
   const manifest = JSON.parse(await readFile(new URL("../dist/MANIFEST.json", import.meta.url)));
   const css = await readFile(new URL("../dist/basecoat-factory.min.css", import.meta.url));
@@ -22,7 +20,7 @@ test("build matches the coordinated app-factory chrome contract", async () => {
     const pinnedSource = await readFile(new URL(`../${source}`, import.meta.url));
     assert.deepEqual(generated, pinnedSource, `${filename} differs from ${source}`);
     const entry = Object.values(manifest).find((candidate) => candidate.filename === filename);
-    assert.equal(entry.source, filename.startsWith("material-symbols") ? `${source} (app-factory v0.6.12)` : source);
+    assert.equal(entry.source, source);
     assert.equal(entry.integrity, integrity(generated));
   }
 });
