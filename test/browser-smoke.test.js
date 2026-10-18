@@ -2,8 +2,6 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { once } from "node:events";
-import { link, mkdtemp, readFile, rename, rmdir, symlink, unlink } from "node:fs/promises";
-import { join } from "node:path";
 import { chromium } from "playwright";
 import test from "node:test";
 
@@ -25,6 +23,8 @@ async function freePort() {
 }
 
 test("Chromium exercises app-factory product shell on platform surfaces", async (t) => {
+  const { link, mkdtemp, readFile, rename, rmdir, symlink, unlink } = await import("node:fs/promises");
+  const { join } = await import("node:path");
   const port = await freePort();
   const origin = `http://127.0.0.1:${port}`;
   const server = spawn("python", ["test/platform_app.py", "--port", String(port)], {
@@ -48,7 +48,6 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
     await new Promise((resolve) => setTimeout(resolve, 100));
     if (attempt === 99) assert.fail(`platform test server did not start: ${stderr}`);
   }
-
   for (const filename of [...platformAssets, "material-symbols.css", "material-symbols-outlined.woff2"]) {
     const url = `${origin}/static/platform/${filename}`;
     const response = await fetch(url, { cache: "no-store" });

@@ -3,17 +3,16 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const copiedAssets = {
-  "basecoat-js.min.js": "node_modules/basecoat-css/dist/js/all.min.js",
-  "htmx.min.js": "node_modules/htmx.org/dist/htmx.min.js",
-  "alpine.min.js": "node_modules/alpinejs/dist/cdn.min.js",
-  "material-symbols.css": "src/material-symbols/material-symbols.css",
-  "material-symbols-outlined.woff2": "src/material-symbols/material-symbols-outlined.woff2",
-};
-
 const integrity = (content) => `sha384-${createHash("sha384").update(content).digest("base64")}`;
 
 test("build matches the coordinated app-factory chrome contract", async () => {
+  const copiedAssets = {
+    "basecoat-js.min.js": "node_modules/basecoat-css/dist/js/all.min.js",
+    "htmx.min.js": "node_modules/htmx.org/dist/htmx.min.js",
+    "alpine.min.js": "node_modules/alpinejs/dist/cdn.min.js",
+    "material-symbols.css": "src/material-symbols/material-symbols.css",
+    "material-symbols-outlined.woff2": "src/material-symbols/material-symbols-outlined.woff2",
+  };
   const manifest = JSON.parse(await readFile(new URL("../dist/MANIFEST.json", import.meta.url)));
   const css = await readFile(new URL("../dist/basecoat-factory.min.css", import.meta.url));
   assert.equal(manifest["basecoat-css"].filename, "basecoat-factory.min.css");
