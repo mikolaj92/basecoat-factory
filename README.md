@@ -12,7 +12,7 @@ Application hosts do not install this package and do not link these files from a
 They install `app-factory[platform]`, extend `app_factory/product_shell.html`, and let
 app-factory serve every asset from `/static/platform/`.
 
-This repo's package version is `0.3.0` (`package.json`; next git tag `v0.3.0`).
+This repo's package version is `0.3.0` (`package.json`).
 That identifier is **not** the `basecoat-css` pin (`1.0.2`). app-factory vendors the
 built `dist/` files; it does not install `@patryk/basecoat-factory` as a runtime package.
 
@@ -21,7 +21,7 @@ built `dist/` files; it does not install `@patryk/basecoat-factory` as a runtime
 The preferred coordinated compatibility row below is verified against
 [app-factory v0.6.12 COMPAT.md](https://github.com/mikolaj92/app-factory/blob/v0.6.12/COMPAT.md).
 Source commit: `b764a35aaa8a9d0d1cea034ef044baa9563c6244`.
-Preferred BOM: the row below. Tested browser smoke: published Git tag `v0.6.12`.
+The browser smoke installs published Git tag `v0.6.12`.
 
 | Component | Pin |
 |-----------|-----|
@@ -64,24 +64,24 @@ npx playwright install --with-deps chromium
 npm test
 ```
 
-`npm ci` installs `playwright@1.55.0` from `devDependencies`; it does not
-download the Chromium browser. The install step is the same command CI runs
-before `npm test` (`.github/workflows/test.yml`). Without it, browser smoke
-fails on `chromium.launch`.
+`npm ci` installs `playwright@1.55.0`, not Chromium. CI installs Chromium as above;
+`npm test` also installs it in `pretest` before `chromium.launch`.
 
 `npm test` runs `npm run build` then `node --test`.
 
-`build` minifies CSS from `src/input.css` and copies the pinned JS files from
-`node_modules` into `dist/`. It does not write `dist/MANIFEST.json`,
-`dist/ATTRIBUTION.txt`, or `dist/licenses/*`; those are hand-committed artifacts.
+`build` minifies `src/input.css`, copies pinned JS from `node_modules`, and copies
+local Material Symbols CSS, font and license into `dist/`, creating directories.
+It does not write `dist/MANIFEST.json` or `dist/ATTRIBUTION.txt`; these and the
+other licenses are hand-committed artifacts.
 
 Tests compare the five npm pins in README with package and lockfile metadata
 and the README app-factory pin with the smoke installation. They do not verify
 my-auth or my-usermanager pins. They check generated CSS/JS against the committed
 `dist/MANIFEST.json` and license notices, then run Chromium with SRI.
-Smoke serves only local `dist/` at `/static/platform/` and compares response bytes.
-Missing files return 404; missing `dist/` prevents startup. Symlinks cannot escape it.
-After rebuilding CSS or changing JS pins, refresh MANIFEST hashes and notices by hand.
+Smoke compares shell assets, CSS dependencies and font bytes with local `dist/`.
+Missing files and escaping symlinks return 404; missing `dist/` prevents startup.
+It temporarily removes Alpine and restores it before Chromium interactions.
+Refresh MANIFEST hashes and notices by hand after changing assets.
 
 Commit generated `dist/` CSS/JS together with source, lockfile, and any
 MANIFEST/notice updates; app-factory then vendors them into its package.

@@ -1,5 +1,4 @@
 basecoat-factory bundled platform assets
-
 - basecoat-css 1.0.2 — MIT
   https://github.com/hunvreus/basecoat
   License: licenses/basecoat-css.LICENSE
@@ -14,5 +13,6 @@ basecoat-factory bundled platform assets
   Copyright (c) Tailwind Labs, Inc.
   https://github.com/tailwindlabs/tailwindcss
   License: licenses/tailwindcss.LICENSE
-
-Exact asset versions, package source paths, and SHA-384 integrity values are recorded in MANIFEST.json.
+- Material Symbols Outlined — Apache-2.0 (app-factory v0.6.12)
+  https://github.com/google/material-design-icons
+  License: licenses/material-symbols.LICENSE
