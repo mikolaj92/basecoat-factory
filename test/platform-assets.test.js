@@ -10,20 +10,17 @@ test("build matches the coordinated app-factory chrome contract", async () => {
     "basecoat-js.min.js": "node_modules/basecoat-css/dist/js/all.min.js",
     "htmx.min.js": "node_modules/htmx.org/dist/htmx.min.js",
     "alpine.min.js": "node_modules/alpinejs/dist/cdn.min.js",
-    "material-symbols.css": "src/material-symbols/material-symbols.css",
-    "material-symbols-outlined.woff2": "src/material-symbols/material-symbols-outlined.woff2",
   };
   const manifest = JSON.parse(await readFile(new URL("../dist/MANIFEST.json", import.meta.url)));
   const css = await readFile(new URL("../dist/basecoat-factory.min.css", import.meta.url));
   assert.equal(manifest["basecoat-css"].filename, "basecoat-factory.min.css");
   assert.equal(integrity(css), manifest["basecoat-css"].integrity);
-
   for (const [filename, source] of Object.entries(copiedAssets)) {
     const generated = await readFile(new URL(`../dist/${filename}`, import.meta.url));
     const pinnedSource = await readFile(new URL(`../${source}`, import.meta.url));
     assert.deepEqual(generated, pinnedSource, `${filename} differs from ${source}`);
     const entry = Object.values(manifest).find((candidate) => candidate.filename === filename);
-    assert.equal(entry.source, filename.startsWith("material-symbols") ? `${source} (app-factory v0.6.12)` : source);
+    assert.equal(entry.source, source);
     assert.equal(entry.integrity, integrity(generated));
   }
 });
@@ -78,8 +75,7 @@ test("redistributed licenses preserve their required notices and grants", async 
     ],
     "licenses/material-symbols.LICENSE": [
       /Apache License Version 2\.0, January 2004/,
-      /You must give any other recipients of the Work or Derivative Works a copy of this License/,
-    ],
+      /You must give any other recipients of the Work or Derivative Works a copy of this License/],
     "licenses/tailwindcss.LICENSE": [
       /Copyright \(c\) Tailwind Labs, Inc\./,
       mitGrant,
@@ -88,7 +84,6 @@ test("redistributed licenses preserve their required notices and grants", async 
   const attribution = await readFile(new URL("../dist/ATTRIBUTION.txt", import.meta.url), "utf8");
   const paths = [...attribution.matchAll(/^\s*License: (\S+)\s*$/gm)].map(([, path]) => path);
   assert.deepEqual(paths.sort(), Object.keys(licenses).sort());
-
   for (const path of paths) {
     const notice = await readFile(new URL(`../dist/${path}`, import.meta.url), "utf8");
     for (const fragment of licenses[path]) {

@@ -53,8 +53,7 @@ Tests check npm pins, the smoke app-factory pin, asset integrity and license not
 they do not verify my-auth or my-usermanager pins.
 Smoke mounts only local `dist/` with StaticFiles: no app-factory asset fallback.
 Missing files, traversal and escaping symlinks return 404; missing `dist/` blocks startup.
-Alpine is temporarily removed, checked for 404 and restored before browser navigation.
-Independent byte comparisons require HTTP 200; Chromium may revalidate with 304.
+Chromium accepts successful asset loads and cache revalidation with HTTP 304.
 Smoke checks login, account, admin, Alpine, HTMX, Basecoat, SRI and same-origin requests.
 
 Commit generated `dist/` with source, lockfile and MANIFEST/notice updates for vendoring.
