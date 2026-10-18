@@ -15,7 +15,7 @@ from app_factory.platform import MenuGroup, MenuItem, PlatformConfig, PlatformPa
 
 ROOT = Path(__file__).resolve().parents[1]
 app = FastAPI()
-app.mount("/static/platform", StaticFiles(directory=ROOT / "dist", check_dir=True))
+app.mount("/static/platform", StaticFiles(directory=ROOT / "dist", check_dir=True, follow_symlink=False))
 ASSETS = json.loads((ROOT / "dist" / "MANIFEST.json").read_text())
 USER = PlatformUser(display_name="Ada Lovelace", is_admin=True, user_id="ada")
 CONFIG = PlatformConfig(

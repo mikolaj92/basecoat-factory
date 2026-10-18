@@ -51,10 +51,10 @@ these and the other licenses are hand-committed artifacts.
 
 Tests check npm pins, the smoke app-factory pin, asset integrity and license notices;
 they do not verify my-auth or my-usermanager pins.
-Smoke mounts only local `dist/` with StaticFiles: no app-factory asset fallback.
-Missing files, traversal and escaping symlinks return 404; missing `dist/` blocks startup.
-Chromium accepts successful asset loads and cache revalidation with HTTP 304.
-Smoke checks login, account, admin, Alpine, HTMX, Basecoat, SRI and same-origin requests.
+Smoke serves only local `dist/` through StaticFiles, without an app-factory fallback.
+Missing files and escaping symlinks return 404; missing `dist/` blocks startup.
+Chromium checks login, account, admin, Alpine, HTMX, Basecoat, SRI and same-origin requests,
+accepting HTTP 200 and cache revalidation with HTTP 304.
 
 Commit generated `dist/` with source, lockfile and MANIFEST/notice updates for vendoring.
 
