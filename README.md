@@ -76,13 +76,13 @@ fails on `chromium.launch`.
 `dist/ATTRIBUTION.txt`, or `dist/licenses/*`; those are hand-committed artifacts.
 
 Tests compare the five npm pins in README with package and lockfile metadata
-and the README app-factory pin with the smoke installation. They do not verify
-my-auth or my-usermanager pins. They also check each generated
-CSS/JS asset against the committed `dist/MANIFEST.json`, assert the committed
-Alpine notice in `dist/licenses/`, and run Chromium against the same-origin
-`/static/platform/` paths with SRI. After a CSS rebuild or JS pin change,
-refresh MANIFEST integrity hashes and license files by hand before committing —
-tests will not regenerate them.
+and the README app-factory pin with the smoke installation, but not my-auth or my-usermanager pins.
+They check generated CSS/JS against committed `dist/MANIFEST.json`, assert the Alpine notice in
+`dist/licenses/`, and run Chromium against same-origin `/static/platform/` paths with SRI.
+Matching URLs alone does not prove the served bytes come from the local `dist/` bundle.
+If a missing local file falls back to app-factory assets, that fallback can hide its absence;
+smoke must reject missing local bundle files rather than rely on URL checks alone.
+After a CSS rebuild or JS pin change, refresh MANIFEST hashes and license files by hand; tests do not regenerate them.
 
 Commit generated `dist/` CSS/JS together with source, lockfile, and any
 MANIFEST/notice updates; app-factory then vendors them into its package.
