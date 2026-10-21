@@ -65,8 +65,8 @@ def admin(request: Request) -> HTMLResponse:
 def platform_asset(filename: str) -> FileResponse:
     if filename not in LOCAL_ASSETS:
         raise HTTPException(status_code=404)
-    local = ROOT / "dist" / filename
-    if not local.is_file():
+    local = (ROOT / "dist" / filename).resolve()
+    if not local.is_relative_to(ROOT / "dist") or not local.is_file():
         raise HTTPException(status_code=404)
     return FileResponse(local)
 
