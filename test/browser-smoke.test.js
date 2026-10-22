@@ -50,7 +50,7 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
   const browserErrors = [];
   page.on("request", (request) => browserRequests.push(request.url()));
   page.on("response", (response) => {
-    if ([...platformAssets].some((filename) => response.url() === `${origin}/static/platform/${filename}`)) assetResponses.push(response);
+    if ([...platformAssets].some((filename) => response.url() === `${origin}/static/platform/${filename}`)) assetResponses.push({ response, body: response.body().catch((error) => error) });
   });
   page.on("console", (message) => {
     if (message.type() === "error") browserErrors.push(message.text());
@@ -84,12 +84,12 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
   assert.equal(await page.evaluate(() => typeof window.Alpine), "object");
 
   for (const filename of platformAssets) {
-    assert.ok(assetResponses.some((response) => response.url() === `${origin}/static/platform/${filename}`), `${filename} has no response from the production path`);
-    for (const response of assetResponses.filter((response) => response.url() === `${origin}/static/platform/${filename}`)) assert.deepEqual(await response.body(), readFileSync(new URL(`../dist/${filename}`, import.meta.url)), `${filename} differs from local dist`);
+    assert.ok(assetResponses.some(({ response }) => response.url() === `${origin}/static/platform/${filename}`), `${filename} has no response from the production path`);
+    for (const { body } of assetResponses.filter(({ response }) => response.url() === `${origin}/static/platform/${filename}`)) assert.deepEqual(await body, readFileSync(new URL(`../dist/${filename}`, import.meta.url)), `${filename} differs from local dist`);
     const asset = page.locator(`[src="/static/platform/${filename}"], [href="/static/platform/${filename}"]`);
     assert.match(await asset.getAttribute("integrity"), /^sha384-\S+$/);
   }
-  assert.ok(assetResponses.every((response) => response.status() === 200), "a local platform asset failed to load");
+  assert.ok(assetResponses.every(({ response }) => response.status() === 200), "a local platform asset failed to load");
   assert.deepEqual(browserErrors, []);
   assert.ok(browserRequests.every((url) => new URL(url).origin === origin), "the canonical shell made a cross-origin request");
 });
