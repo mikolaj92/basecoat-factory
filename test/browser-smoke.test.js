@@ -23,7 +23,7 @@ async function freePort() {
   return port;
 }
 
-test("Chromium exercises app-factory product shell on platform surfaces", async (t) => {
+test("Chromium exercises app-factory product shell on platform surfaces", { timeout: 60_000 }, async (t) => {
   const port = await freePort();
   const origin = `http://127.0.0.1:${port}`;
   const server = spawn("python", ["test/platform_app.py", "--port", String(port)], {
@@ -36,7 +36,7 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
   for (let attempt = 0; attempt < 100; attempt++) {
     if (server.exitCode !== null) assert.fail(`platform test server exited: ${stderr}`);
     try {
-      if ((await fetch(`${origin}/health`)).ok) break;
+      if ((await fetch(`${origin}/health`, { signal: AbortSignal.timeout(1_000) })).ok) break;
     } catch {}
     await new Promise((resolve) => setTimeout(resolve, 100));
     if (attempt === 99) assert.fail(`platform test server did not start: ${stderr}`);
