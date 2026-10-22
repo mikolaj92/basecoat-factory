@@ -51,7 +51,7 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
   page.on("console", (message) => {
     if (message.type() === "error") browserErrors.push(message.text());
   });
-  page.on("pageerror", (error) => browserErrors.push(error.message));
+  page.on("pageerror", (error) => browserErrors.push(error.message)); page.on("requestfailed", (request) => browserErrors.push(`${request.url()}: ${request.failure()?.errorText}`));
 
   await page.goto(`${origin}/login`);
   assert.equal(await page.locator('[data-surface="login"] h1').textContent(), "Login");
