@@ -49,7 +49,7 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
   const assetResponses = [];
   const browserErrors = [];
   page.on("request", (request) => browserRequests.push(request.url()));
-  page.on("response", (response) => { if (platformAssets.has(new URL(response.url()).pathname.replace(/^\/static\/platform\//, ""))) assetResponses.push(response); });
+  page.on("response", (response) => { if ([...platformAssets].some((filename) => new URL(response.url()).pathname === `/static/platform/${filename}`)) assetResponses.push(response); });
   page.on("console", (message) => {
     if (message.type() === "error") browserErrors.push(message.text());
   });
@@ -83,8 +83,8 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
 
   for (const filename of platformAssets) {
     assert.ok(browserRequests.includes(`${origin}/static/platform/${filename}`), `${filename} was not requested from the production path`);
-    const responses = assetResponses.filter((response) => new URL(response.url()).pathname === `/static/platform/${filename}`); assert.ok(responses.length > 0, `${filename} response was not received`);
-    for (const response of responses) assert.deepEqual(await response.body(), await readFile(new URL(`../dist/${filename}`, import.meta.url)), `${filename} differs from local dist bytes`);
+    const responses = assetResponses.filter((response) => new URL(response.url()).pathname === `/static/platform/${filename}`); assert.ok(responses.length > 0, `${filename} response was not received`); const expected = await readFile(new URL(`../dist/${filename}`, import.meta.url));
+    for (const response of responses) assert.deepEqual(await response.body(), expected, `${filename} differs from local dist bytes`);
     const asset = page.locator(`[src="/static/platform/${filename}"], [href="/static/platform/${filename}"]`);
     assert.match(await asset.getAttribute("integrity"), /^sha384-\S+$/);
   }
