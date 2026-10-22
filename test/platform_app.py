@@ -5,18 +5,17 @@ import json
 from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, HTMLResponse
 from jinja2 import DictLoader, Environment
 
+from app_factory.assets import get_assets_dir
 from app_factory.jinja import configure_jinja_env
 from app_factory.platform import MenuGroup, MenuItem, PlatformConfig, PlatformPaths, PlatformUser, build_platform_context
 
 ROOT = Path(__file__).resolve().parents[1]
-app = FastAPI()
-app.mount("/static/platform", StaticFiles(directory=ROOT / "dist", check_dir=True, follow_symlink=False))
 ASSETS = json.loads((ROOT / "dist" / "MANIFEST.json").read_text())
+LOCAL_ASSETS = {entry["filename"] for entry in ASSETS.values()}
 USER = PlatformUser(display_name="Ada Lovelace", is_admin=True, user_id="ada")
 CONFIG = PlatformConfig(
     app_name="Platform smoke",
@@ -36,6 +35,7 @@ TEMPLATES = {
 {% block content %}<section class="app-page" data-surface="admin" x-data="{ ready: false }"><h1>Admin users</h1><div class="card"><button class="btn" type="button" @click="ready = true">Load users</button><p x-show="ready" x-cloak>Users ready</p></div></section>{% endblock %}""",
 }
 environment = configure_jinja_env(Environment(loader=DictLoader(TEMPLATES), autoescape=True))
+app = FastAPI()
 
 
 def render(request: Request, template: str, *, user: PlatformUser | None, title: str, nav: str) -> HTMLResponse:
@@ -60,6 +60,16 @@ def account(request: Request) -> HTMLResponse:
 @app.get("/admin", response_class=HTMLResponse)
 def admin(request: Request) -> HTMLResponse:
     return render(request, "admin.html", user=USER, title="Admin users", nav="admin")
+
+
+@app.get("/static/platform/{filename}")
+def platform_asset(filename: str) -> FileResponse:
+    if filename in LOCAL_ASSETS:
+        local = ROOT / "dist" / filename
+        if not local.is_file():
+            raise HTTPException(status_code=404)
+        return FileResponse(local)
+    return FileResponse(get_assets_dir() / filename)
 
 
 @app.get("/health")

@@ -89,7 +89,7 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
     assert.match(await asset.getAttribute("integrity"), /^sha384-\S+$/);
   }
   assert.ok(assetResponses.length >= platformAssets.size);
-  assert.ok(assetResponses.every((status) => [200, 304].includes(status)), "a local platform asset failed to load");
+  assert.ok(assetResponses.every((status) => status === 200), "a local platform asset failed to load");
   assert.deepEqual(browserErrors, []);
   assert.ok(browserRequests.every((url) => new URL(url).origin === origin), "the canonical shell made a cross-origin request");
 });

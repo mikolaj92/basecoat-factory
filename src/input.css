@@ -8,7 +8,7 @@
   Consumers receive dist through app-factory same-origin `/static/platform/`. No npm / Tailwind in apps.
 */
 
-@import "tailwindcss" source(none);
+@import "tailwindcss";
 @import "basecoat-css";
 @import "./app-shell.css";
 

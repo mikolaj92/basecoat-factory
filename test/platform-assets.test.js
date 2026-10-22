@@ -3,6 +3,12 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+const copiedAssets = {
+  "basecoat-js.min.js": "node_modules/basecoat-css/dist/js/all.min.js",
+  "htmx.min.js": "node_modules/htmx.org/dist/htmx.min.js",
+  "alpine.min.js": "node_modules/alpinejs/dist/cdn.min.js",
+};
+
 const integrity = (content) => `sha384-${createHash("sha384").update(content).digest("base64")}`;
 
 test("build matches the coordinated app-factory chrome contract", async () => {
@@ -10,11 +16,8 @@ test("build matches the coordinated app-factory chrome contract", async () => {
   const css = await readFile(new URL("../dist/basecoat-factory.min.css", import.meta.url));
   assert.equal(manifest["basecoat-css"].filename, "basecoat-factory.min.css");
   assert.equal(integrity(css), manifest["basecoat-css"].integrity);
-  for (const [filename, source] of Object.entries({
-    "basecoat-js.min.js": "node_modules/basecoat-css/dist/js/all.min.js",
-    "htmx.min.js": "node_modules/htmx.org/dist/htmx.min.js",
-    "alpine.min.js": "node_modules/alpinejs/dist/cdn.min.js",
-  })) {
+
+  for (const [filename, source] of Object.entries(copiedAssets)) {
     const generated = await readFile(new URL(`../dist/${filename}`, import.meta.url));
     const pinnedSource = await readFile(new URL(`../${source}`, import.meta.url));
     assert.deepEqual(generated, pinnedSource, `${filename} differs from ${source}`);
@@ -55,10 +58,6 @@ test("package version is this repo, not the basecoat-css pin", async () => {
   assert.equal(lock.version, "0.3.0");
   assert.equal(lock.packages[""].version, "0.3.0");
   assert.notEqual(packageJson.version, packageJson.devDependencies["basecoat-css"]);
-  const readme = await readFile(new URL("../README.md", import.meta.url), "utf8");
-  assert.match(readme, /package version is `0\.3\.0`/);
-  assert.match(readme, /\| @patryk\/basecoat-factory \| `0\.3\.0` \|/);
-  assert.match(readme, /\| basecoat-css \| `1\.0\.2` \|/);
 });
 
 test("redistributed licenses preserve their required notices and grants", async () => {
@@ -76,10 +75,6 @@ test("redistributed licenses preserve their required notices and grants", async 
       /Zero-Clause BSD/,
       /Permission to use, copy, modify, and\/or distribute this software for any purpose with or without fee is hereby granted\./,
     ],
-    "licenses/material-symbols.LICENSE": [
-      /Apache License Version 2\.0, January 2004/,
-      /You must give any other recipients of the Work or Derivative Works a copy of this License/,
-    ],
     "licenses/tailwindcss.LICENSE": [
       /Copyright \(c\) Tailwind Labs, Inc\./,
       mitGrant,
@@ -88,9 +83,12 @@ test("redistributed licenses preserve their required notices and grants", async 
   const attribution = await readFile(new URL("../dist/ATTRIBUTION.txt", import.meta.url), "utf8");
   const paths = [...attribution.matchAll(/^\s*License: (\S+)\s*$/gm)].map(([, path]) => path);
   assert.deepEqual(paths.sort(), Object.keys(licenses).sort());
+
   for (const path of paths) {
     const notice = await readFile(new URL(`../dist/${path}`, import.meta.url), "utf8");
-    licenses[path].forEach((fragment) => assert.match(notice.replace(/\s+/g, " "), fragment, path));
+    for (const fragment of licenses[path]) {
+      assert.match(notice.replace(/\s+/g, " "), fragment, path);
+    }
   }
 });
 
@@ -99,6 +97,13 @@ test("README documents that MANIFEST and notices are hand-committed", async () =
   assert.doesNotMatch(readme, /preserves third-party notices/);
   assert.match(readme, /does not write `dist\/MANIFEST\.json`/);
   assert.match(readme, /hand-committed artifacts/);
+});
+
+test("README names this repo version separately from the basecoat-css pin", async () => {
+  const readme = await readFile(new URL("../README.md", import.meta.url), "utf8");
+  assert.match(readme, /package version is `0\.3\.0`/);
+  assert.match(readme, /\| @patryk\/basecoat-factory \| `0\.3\.0` \|/);
+  assert.match(readme, /\| basecoat-css \| `1\.0\.2` \|/);
 });
 
 test("README installs Chromium before npm test, matching CI", async () => {

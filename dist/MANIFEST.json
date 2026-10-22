@@ -7,21 +7,9 @@
   },
   "basecoat-css": {
     "filename": "basecoat-factory.min.css",
-    "integrity": "sha384-PwOW6TERNCvETfJWPh0dn3HPn3eJ6cov1S06DjHlnLzvLU+9y71b5jBlkOjmzdEF",
-    "source": "src/input.css (Tailwind source(none) + explicit @source directives)",
+    "integrity": "sha384-XjI5req4tfV0DC7F/QZwxR1NxJIU1qJ0PxuJCWAudmS5/DsNoLcp+TRPqkO4Jd5D",
+    "source": "src/input.css (Tailwind scan + explicit @source directives)",
     "version": "1.0.2"
-  },
-  "material-symbols-css": {
-    "filename": "material-symbols.css",
-    "integrity": "sha384-vpjqPXwf9YtJdo+ZHBP+P0pu2V8JzpFByBiP82EKfbiG3wGH0GcuhnaX1C83KBcc",
-    "source": "src/material-symbols/material-symbols.css (app-factory v0.6.12)",
-    "version": "app-factory-v0.6.12"
-  },
-  "material-symbols-font": {
-    "filename": "material-symbols-outlined.woff2",
-    "integrity": "sha384-zWFJ47rRvgTzWn7XnBshCIlSw15zVb1rjYzHeQoIQY9oERj3TeDdMR60ikEw9ft0",
-    "source": "src/material-symbols/material-symbols-outlined.woff2 (app-factory v0.6.12)",
-    "version": "app-factory-v0.6.12"
   },
   "basecoat-js-all": {
     "filename": "basecoat-js.min.js",
