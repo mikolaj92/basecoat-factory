@@ -49,9 +49,8 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
   const browserErrors = [];
   page.on("request", (request) => browserRequests.push(request.url()));
   page.on("response", (response) => { if ([...platformAssets].some((filename) => new URL(response.url()).pathname === `/static/platform/${filename}`)) assetResponses.push(response); });
-  page.on("console", (message) => {
-    if (message.type() === "error") browserErrors.push(message.text());
-  });
+  page.on("console", (message) => { if (message.type() === "error") browserErrors.push(message.text()); });
+  page.on("requestfailed", (request) => browserErrors.push(`${request.url()}: ${request.failure()?.errorText}`));
   page.on("pageerror", (error) => browserErrors.push(error.message));
 
   await page.goto(`${origin}/login`);
