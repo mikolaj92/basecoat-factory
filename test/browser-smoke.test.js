@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { once } from "node:events";
+import { readFileSync } from "node:fs";
 import { chromium } from "playwright";
 import test from "node:test";
 
@@ -22,7 +23,7 @@ async function freePort() {
   return port;
 }
 
-test("Chromium exercises app-factory product shell on platform surfaces", async (t) => {
+test("Chromium exercises app-factory product shell on platform surfaces", { timeout: 60_000 }, async (t) => {
   const port = await freePort();
   const origin = `http://127.0.0.1:${port}`;
   const server = spawn("python", ["test/platform_app.py", "--port", String(port)], {
@@ -35,7 +36,7 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
   for (let attempt = 0; attempt < 100; attempt++) {
     if (server.exitCode !== null) assert.fail(`platform test server exited: ${stderr}`);
     try {
-      if ((await fetch(`${origin}/health`)).ok) break;
+      if ((await fetch(`${origin}/health`, { signal: AbortSignal.timeout(1_000) })).ok) break;
     } catch {}
     await new Promise((resolve) => setTimeout(resolve, 100));
     if (attempt === 99) assert.fail(`platform test server did not start: ${stderr}`);
@@ -49,8 +50,7 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
   const browserErrors = [];
   page.on("request", (request) => browserRequests.push(request.url()));
   page.on("response", (response) => {
-    if (platformAssets.has(new URL(response.url()).pathname.split("/").pop()))
-      assetResponses.push(response.status());
+    if ([...platformAssets].some((filename) => response.url() === `${origin}/static/platform/${filename}`)) assetResponses.push({ response, body: response.body().catch((error) => error) });
   });
   page.on("console", (message) => {
     if (message.type() === "error") browserErrors.push(message.text());
@@ -84,12 +84,12 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
   assert.equal(await page.evaluate(() => typeof window.Alpine), "object");
 
   for (const filename of platformAssets) {
-    assert.ok(browserRequests.includes(`${origin}/static/platform/${filename}`), `${filename} was not requested from the production path`);
+    assert.ok(assetResponses.some(({ response }) => response.url() === `${origin}/static/platform/${filename}`), `${filename} has no response from the production path`);
+    for (const { body } of assetResponses.filter(({ response }) => response.url() === `${origin}/static/platform/${filename}`)) assert.deepEqual(await body, readFileSync(new URL(`../dist/${filename}`, import.meta.url)), `${filename} differs from local dist`);
     const asset = page.locator(`[src="/static/platform/${filename}"], [href="/static/platform/${filename}"]`);
     assert.match(await asset.getAttribute("integrity"), /^sha384-\S+$/);
   }
-  assert.ok(assetResponses.length >= platformAssets.size);
-  assert.ok(assetResponses.every((status) => status === 200), "a local platform asset failed to load");
+  assert.ok(assetResponses.every(({ response }) => response.status() === 200), "a local platform asset failed to load");
   assert.deepEqual(browserErrors, []);
   assert.ok(browserRequests.every((url) => new URL(url).origin === origin), "the canonical shell made a cross-origin request");
 });
