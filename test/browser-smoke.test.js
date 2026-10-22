@@ -80,9 +80,9 @@ test("Chromium exercises app-factory product shell on platform surfaces", async 
   assert.equal(await page.evaluate(() => typeof window.Alpine), "object");
 
   for (const filename of platformAssets) {
-    const responses = assetResponses.filter((response) => new URL(response.url()).pathname === `/static/platform/${filename}`);
+    const responses = assetResponses.filter((response) => new URL(response.url()).pathname === `/static/platform/${filename}`), expectedBody = await readFile(new URL(`../dist/${filename}`, import.meta.url));
     assert.ok(responses.length > 0, `${filename} had no platform response`);
-    for (const response of responses) assert.deepEqual(await response.body(), await readFile(new URL(`../dist/${filename}`, import.meta.url)), `${filename} differs from dist`);
+    for (const response of responses) assert.deepEqual(await response.body(), expectedBody, `${filename} differs from dist`);
     assert.ok(browserRequests.includes(`${origin}/static/platform/${filename}`), `${filename} was not requested from the production path`);
     const asset = page.locator(`[src="/static/platform/${filename}"], [href="/static/platform/${filename}"]`);
     assert.match(await asset.getAttribute("integrity"), /^sha384-\S+$/);
