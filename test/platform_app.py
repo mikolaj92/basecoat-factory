@@ -9,6 +9,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse
 from jinja2 import DictLoader, Environment
 
+from app_factory.assets import get_assets_dir
 from app_factory.jinja import configure_jinja_env
 from app_factory.platform import MenuGroup, MenuItem, PlatformConfig, PlatformPaths, PlatformUser, build_platform_context
 
@@ -64,11 +65,11 @@ def admin(request: Request) -> HTMLResponse:
 @app.get("/static/platform/{filename}")
 def platform_asset(filename: str) -> FileResponse:
     if filename in LOCAL_ASSETS:
-        local = (ROOT / "dist" / filename).resolve()
-        if not local.is_relative_to(ROOT / "dist") or not local.is_file():
+        local = ROOT / "dist" / filename
+        if not local.is_file():
             raise HTTPException(status_code=404)
         return FileResponse(local)
-    raise HTTPException(status_code=404)
+    return FileResponse(get_assets_dir() / filename)
 
 
 @app.get("/health")
